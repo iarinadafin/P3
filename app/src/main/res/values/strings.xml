@@ -1,3 +1,220 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="empty_string"> </string>
+
+    <string name="auth_failed">Auth failed!</string>
+    <string name="login_button">Login</string>
+    <string name="email_login">abc1d23@soton.ac.uk</string>
+    <string name="password_login">••••••••</string>
+
+    <string name="signup_button">Sign Up</string>
+    <string name="first_name_label">First name</string>
+    <string name="first_name">Anne</string>
+    <string name="last_name_label">Last name</string>
+    <string name="last_name">Carter</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password_label">Confirm password</string>
+    <string-array name="course_array">
+        <item>Electronic Engineering</item>
+        <item>Computer Science</item>
+        <item>Software Engineering</item>
+    </string-array>
+    <string name="course_label">Choose your course</string>
+    <string name="year_label">Choose your year</string>
+    <string name="year_value_1">1</string>
+    <string name="year_value_2">2</string>
+    <string name="year_value_3">3</string>
+    <string name="year_value_4">4</string>
+
+    <string name="welcome_message">Welcome back, %s!</string>
+    <string name="create_meeting_button">Set up a meeting</string>
+
+    <string name="choose_module_label">Choose a module:</string>
+    <!-- electro eng -->
+    <string-array name="ee_courses_year_1">
+        <item>TT Electronic Labs Yr1</item>
+        <item>Electronic Circuits</item>
+        <item>Programming</item>
+        <item>Digital Systems and Microprocessors</item>
+        <item>Advanced Programming</item>
+        <item>Solid State Devices</item>
+        <item>Electrical Materials and Fields</item>
+        <item>Electronic Systems</item>
+        <item>Mathematics for Electronic and Electrical Engineering</item>
+        <item>Engineering Mathematics Workshop</item>
+    </string-array>
+    <string-array name="ee_courses_year_2">
+        <item>TT Electronic Labs Yr2</item>
+        <item>Devices</item>
+        <item>Computer Engineering</item>
+        <item>Electronic Design</item>
+        <item>Electromagnetism for Communications</item>
+        <item>Advanced Electronic Systems</item>
+        <item>Control and Communications</item>
+        <item>Digital Systems and Signal Processing</item>
+        <item>Mathematics for Electronics and Electrical Engineering Part II</item>
+    </string-array>
+    <string-array name="ee_courses_year_3">
+        <item>Part III Individual Project</item>
+        <item>Engineering Management and Law</item>
+        <item>Cyber Security</item>
+        <item>Machine Learning</item>
+        <item>Computational Biology</item>
+        <item>Principles and Practice of Computer Graphics</item>
+        <item>Real-Time Computing and Embedded Systems</item>
+        <item>Secure Systems</item>
+        <item>Robotic Systems</item>
+        <item>Green Electronics</item>
+        <item>Digital Coding and Transmission</item>
+        <item>Wireless and Optical Communications</item>
+        <item>Control System Design</item>
+        <item>Digital Control System Design</item>
+        <item>Nanoelectronic Devices</item>
+        <item>Analogue and Mixed Signal Electronics</item>
+        <item>Photonics</item>
+        <item>Signal and Image Processing</item>
+        <item>Advanced Computer Architecture</item>
+        <item>Digital IC and Systems Design</item>
+        <item>Computer Networks</item>
+        <item>Introduction to Bionanotechnology</item>
+        <item>Operational Research</item>
+        <item>Optimisation</item>
+        <item>Advanced Partial Differential Equations</item>
+        <item>Integral Transform Methods</item>
+        <item>Operational Research</item>
+        <item>Optimisation</item>
+    </string-array>
+    <string-array name="ee_courses_year_4">
+        <item>Group Design Project</item>
+        <item>Evolution of Complexity</item>
+        <item>Software Project Management and Development</item>
+        <item>Advanced Computer Vision</item>
+        <item>Advanced Machine Learning</item>
+        <item>Computational Finance</item>
+        <item>Individual Research Project</item>
+        <item>Microfabrication</item>
+        <item>Advanced Memory and Storage</item>
+        <item>Introduction to MEMS</item>
+        <item>Microfluidics and Lab-on-a-Chip</item>
+        <item>Bionanotechnology</item>
+        <item>Nanofabrication and Microscopy</item>
+        <item>Quantum Devices and Technology</item>
+        <item>MEMS Sensors and Actuators</item>
+        <item>Practical Application of MEMS</item>
+        <item>Biosensors</item>
+        <item>Biological Inspired Robotics</item>
+        <item>Image Processing</item>
+        <item>Advanced Wireless Communications Networks and Systems</item>
+        <item>Personal Multimedia Communications</item>
+        <item>Radio Communications Engineering</item>
+        <item>Medical Electrical and Electronic Technologies</item>
+        <item>Applied Control Systems</item>
+        <item>VLSI Systems Design</item>
+        <item>VLSI Design Project</item>
+        <item>Analogue and Mixed Signal CMOS Design</item>
+        <item>Digital Systems Synthesis</item>
+        <item>Embedded Processors</item>
+        <item>SOC Design Project</item>
+        <item>Secure Hardware Design</item>
+        <item>Cryptography</item>
+        <item>Wireless Networks</item>
+        <item>Future Wireless Techniques</item>
+        <item>Numerical Methods</item>
+        <item>Modelling with Differential Equations</item>
+        <item>Photonic Materials</item>
+        <item>Metamaterials, Nanophotonics and Plasmonics</item>
+        <item>An Introduction to Silicon Photonics</item>
+        <item>Optical Fibre Technology I</item>
+        <item>Optical Fibre Technology II</item>
+    </string-array>
+    <!-- comp sci and soft eng -->
+    <string-array name="csse_courses_year_1">
+        <item>Algorithmics</item>
+        <item>Programming I</item>
+        <item>Computer Systems I</item>
+        <item>Data Management</item>
+        <item>Professional Development</item>
+        <item>Programming II</item>
+        <item>Foundations of Computer Science</item>
+        <item>Software Modelling and Design</item>
+    </string-array>
+    <string-array name="csse_courses_year_2">
+        <item>Distributed Systems and Networks</item>
+        <item>Intelligent Systems</item>
+        <item>Programming III</item>
+        <item>Theory of Computing</item>
+        <item>Software Engineering Group Project</item>
+        <item>Programming Language Concepts</item>
+        <item>Advanced Software Modelling and Design</item>
+        <item>Computer Systems II</item>
+        <item>Interaction Design</item>
+    </string-array>
+    <string-array name="csse_courses_year_3">
+        <item>Part III Individual Project</item>
+        <item>Engineering Management and Law</item>
+        <item>Cyber Security</item>
+        <item>Computer Vision</item>
+        <item>Machine Learning</item>
+        <item>Cloud Application Development</item>
+        <item>Social Computing Techniques</item>
+        <item>Advanced Computer Networks</item>
+        <item>Advanced Databases</item>
+        <item>Computational Biology</item>
+        <item>Principles and Practice of Computer Graphics</item>
+        <item>Real-Time Computing and Embedded Systems</item>
+        <item>Secure Systems</item>
+        <item>Game Design and Development</item>
+        <item>Robotic Systems</item>
+        <item>Advanced Computer Architecture</item>
+        <item>Operational Research</item>
+        <item>Optimisation</item>
+        <item>Web Infrastructure</item>
+    </string-array>
+    <string-array name="csse_courses_year_4">
+        <item>Group Design Project</item>
+        <item>E-Business Strategy</item>
+        <item>Evolution of Complexity</item>
+        <item>Intelligent Agents</item>
+        <item>Software Project Management and Development</item>
+        <item>Web Development</item>
+        <item>Advanced Computer Vision</item>
+        <item>Advanced Intelligent Agents</item>
+        <item>Advanced Machine Learning</item>
+        <item>Automated Code Generation</item>
+        <item>Biometrics</item>
+        <item>Computational Finance</item>
+        <item>Open Data Innovation</item>
+        <item>Semantic Web Technologies</item>
+        <item>Simulation Modelling for Computer Science</item>
+        <item>The Science of Online Social Networks</item>
+        <item>Web Architecture</item>
+        <item>Designing Usable and Accessible Technologies</item>
+        <item>Foundations of Cyber Security</item>
+        <item>Individual Research Project</item>
+        <item>Data Visualisation</item>
+        <item>Software Engineering and Cyber Security</item>
+        <item>Data Mining</item>
+        <item>Biological Inspired Robotics</item>
+        <item>Image Processing</item>
+        <item>Cryptography</item>
+        <item>Wireless Networks</item>
+        <item>Foundations of Web Science</item>
+    </string-array>
+
+    <string name="module_meetings_label">%s Meetings</string>
+    <string name="create_a_new_meeting">Create a new meeting</string>
+    <string name="no_meetings_label">There are no meetings for this module.</string>
+    <string name="view_button">View</string>
+    <string name="message_button">Message</string>
+    <string name="join_button">Join</string>
+    <string name="date_field">%1$s, %2$s %3$s, %4$s</string>
+    <plurals name="no_of_participants">
+        <item quantity="one">1 participant joined</item>
+        <item quantity="other">%s participants joined</item>
+    </plurals>
+
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
