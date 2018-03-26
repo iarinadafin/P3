@@ -208,6 +208,7 @@
     <string name="view_button">View</string>
     <string name="message_button">Message</string>
     <string name="join_button">Join</string>
+    <string name="leave_meeting">Leave meeting</string>
     <string name="date_field">%1$s, %2$s %3$s, %4$s</string>
     <plurals name="no_of_participants">
         <item quantity="one">1 participant joined</item>
@@ -217,4 +218,23 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="edit_meeting">Edit</string>
+    <string name="cancel_meeting">Cancel</string>
+    <string name="participants_label">Participants</string>
+    <string name="details_label">Details</string>
+    <string name="date_label">Date</string>
+    <string name="time_label">Time</string>
+
+    <string name="meeting_name_label">Meeting name</string>
+    <string name="meeting_name">Exam Preparation</string>
+    <string name="start_time_label">Start time</string>
+    <string name="end_time_label">End time</string>
+    <string name="choose_date">Choose a date</string>
+    <string name="choose_start_time">Choose a start time</string>
+    <string name="choose_end_time">Choose an end time</string>
+    <string name="date_format_create">%1$s %2$d, %3$d</string>
+    <string name="time_format_create">%1$s:%2$s</string>
+    <string name="confirm_meeting_create">Submit</string>
+
 </resources>

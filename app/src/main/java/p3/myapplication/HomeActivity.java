@@ -98,8 +98,6 @@ public class HomeActivity extends AppCompatActivity {
 		final String userID = currentUser.getUid();
 		User user;
 
-		Log.d("mytag", userID);
-
 		for (DataSnapshot data : dataSnapshot.getChildren()) {
 			user = dataSnapshot.getValue(User.class);
 			user.setCourse(dataSnapshot.getValue(User.class).getCourse());

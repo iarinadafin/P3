@@ -10,9 +10,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="56dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -20,44 +20,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/meetingTitle2"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_weight="1"
-            android:fillViewport="true"
-            android:fontFamily="sans-serif-condensed"
-            android:text="string/empty_string"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="16dp"/>
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/meetingTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_weight="1"
-            android:fillViewport="true"
-            android:fontFamily="sans-serif-condensed"
-            android:text="string/empty_string"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="16dp"/>
+            <TextView
+                android:id="@+id/meetingTitleView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:fontFamily="sans-serif-condensed"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="16dp"/>
+
+            <TextView
+                android:id="@+id/meetingModuleView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:fontFamily="sans-serif-condensed"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="16dp"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="56dp"
             android:layout_marginTop="16dp"
-            android:layout_weight="1"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -66,26 +65,158 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/messageJoinButtonView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="42dp"
                 android:layout_weight="1"
-                android:text="Button"/>
+                android:text="@string/message_button"/>
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/editButtonView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="42dp"
                 android:layout_weight="1"
-                android:text="Button"/>
+                android:text="@string/edit_meeting"
+                tools:clickable="false"
+                android:clickable="false"/>
+
+            <Button
+                android:id="@+id/cancelButtonView"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:text="@string/cancel_meeting"
+                android:clickable="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="-58dp">
 
             <Button
                 android:id="@+id/button2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Button"/>
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:text="@string/leave_meeting"
+                android:textColor="@color/colorAccent"/>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/participantsLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:fontFamily="sans-serif-condensed"
+                android:text="@string/participants_label"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="16dp"/>
+
+            <ListView
+                android:id="@+id/participantsListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="#b5b5b5"
+                android:dividerHeight="1dp"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:scrollbarStyle="outsideOverlay"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/detailsLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true"
+                android:fontFamily="sans-serif-condensed"
+                android:text="@string/details_label"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dateLabelView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fillViewport="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/date_label"
+                    android:textAlignment="viewStart"
+                    android:textAllCaps="false"
+                    android:textSize="18sp"
+                    tools:layout_editor_absoluteX="8dp"
+                    tools:layout_editor_absoluteY="16dp"/>
+
+                <TextView
+                    android:id="@+id/timeLabelView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fillViewport="true"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/time_label"
+                    android:textAlignment="viewStart"
+                    android:textAllCaps="false"
+                    android:textSize="18sp"
+                    tools:layout_editor_absoluteX="8dp"
+                    tools:layout_editor_absoluteY="16dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dateView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="TextView"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                    android:textSize="18sp"/>
+
+                <TextView
+                    android:id="@+id/timeView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="TextView"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
+                    android:textSize="18sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
@@ -97,6 +228,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_navigation_items"/>
+        app:menu="@menu/bottom_navigation_items">
+
+    </android.support.design.widget.BottomNavigationView>
 
 </android.support.constraint.ConstraintLayout>

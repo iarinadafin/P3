@@ -1,5 +1,6 @@
 package p3.myapplication;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,6 +33,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 
 	TextView moduleMeetingsTitle;
 	ListView moduleMeetingsList;
+	Button createNewMeeting;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +43,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 		mAuth = FirebaseAuth.getInstance();
 		currentUser = mAuth.getCurrentUser();
 
-		BottomNavigationView navigation = findViewById(R.id.navigationModuleList);
+		BottomNavigationView navigation = findViewById(R.id.navigationModuleMeetings);
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -56,6 +59,14 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 		moduleMeetingsTitle.setText(String.format(getResources().getString(R.string.module_meetings_label), module));
 
 		showModuleMeetings();
+
+		createNewMeeting = findViewById(R.id.addMeetingCreate);
+		createNewMeeting.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				goToCreateNewMeeting();
+			}
+		});
 	}
 
 	public void showModuleMeetings () {
@@ -80,8 +91,20 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 			TextView message = findViewById(R.id.noMeetingsLabel);
 			message.setVisibility(View.GONE);
 
+			// checks if current user is a member of this meeting
+			Boolean isMember = false;
+			if (data.child("members/" + mAuth.getUid()).exists())
+				isMember = true;
+
 			// sends all meeting details
-			String [] meetingDetails = {data.child("name").getValue(String.class), data.child("start").getValue(String.class), data.child("end").getValue(String.class), String.valueOf(data.child("members").getChildrenCount()), data.getKey()};
+			String [] meetingDetails = {data.child("name").getValue(String.class), // name of meeting [0]
+										data.child("startDate").getValue(String.class), // start timestamp of meeting [1]
+										data.child("endDate").getValue(String.class), // end timestamp of meeting [2]
+										String.valueOf(data.child("members").getChildrenCount()), // number of members in the meeting [3]
+										data.getKey(), // key of database reference [4]
+										module, // name of the meeting module [5]
+										isMember.toString(), // if current user is a member [6]
+										mAuth.getUid()}; // current user id [7]
 			list.add(meetingDetails);
 		}
 
@@ -97,6 +120,12 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 	@Override
 	public void onStop() {
 		super.onStop();
+	}
+
+	void goToCreateNewMeeting () {
+		Intent i = new Intent(this, CreateMeetingActivity.class);
+		i.putExtra("p3.myapplication:module_name_list", module);
+		startActivity(i);
 	}
 
 }

@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
 	public void onStart() {
 		super.onStart();
 		mAuth.addAuthStateListener(mAuthListener); // initialises user auth listener
-		mAuth.signOut();
+		//mAuth.signOut();
 	}
 
 	@Override

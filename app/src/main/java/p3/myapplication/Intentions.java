@@ -35,6 +35,15 @@ class Intentions {
 		c.startActivity(i);
 	}
 
+	void goToViewMeeting (String meetingID, String module, String dateString, String hoursString) {
+		Intent i = new Intent(c, ViewMeetingActivity.class);
+		i.putExtra("p3.myapplication:meeting_id", meetingID); // sends id of meeting
+		i.putExtra("p3.myapplication:module_id", module); // sends module name
+		i.putExtra("p3.myapplication:date", dateString); // sends date
+		i.putExtra("p3.myapplication:hours", hoursString); // sends hours
+		c.startActivity(i);
+	}
+
 	boolean chooseMenuItem (MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_home: {

@@ -28,6 +28,8 @@
         </activity>
         <activity android:name=".ViewMeetingActivity">
         </activity>
+        <activity android:name=".CreateMeetingActivity">
+        </activity>
     </application>
 
 </manifest>
