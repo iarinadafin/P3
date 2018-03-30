@@ -34,6 +34,9 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 	TextView moduleMeetingsTitle;
 	ListView moduleMeetingsList;
 	Button createNewMeeting;
+	TextView message;
+
+	CustomArrayAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 
 		moduleMeetingsTitle = findViewById(R.id.moduleMeetingsTitle);
 		moduleMeetingsList = findViewById(R.id.moduleMeetingsList);
+		message = findViewById(R.id.noMeetingsLabel);
 
 		module = getIntent().getExtras().getString("p3.myapplication:module");
 		moduleMeetingsTitle.setText(String.format(getResources().getString(R.string.module_meetings_label), module));
@@ -88,7 +92,6 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 		List<String[]> list = new ArrayList<>();
 
 		for (DataSnapshot data : dataSnapshot.getChildren()) {
-			TextView message = findViewById(R.id.noMeetingsLabel);
 			message.setVisibility(View.GONE);
 
 			// checks if current user is a member of this meeting
@@ -108,7 +111,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 			list.add(meetingDetails);
 		}
 
-		CustomArrayAdapter adapter = new CustomArrayAdapter(0, this, list);
+		adapter = new CustomArrayAdapter(0, this, list);
 		moduleMeetingsList.setAdapter(adapter);
 	}
 
@@ -122,10 +125,17 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 		super.onStop();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		if (adapter != null && adapter.isEmpty())
+			message.setVisibility(View.VISIBLE);
+	}
+
 	void goToCreateNewMeeting () {
 		Intent i = new Intent(this, CreateMeetingActivity.class);
 		i.putExtra("p3.myapplication:module_name_list", module);
 		startActivity(i);
 	}
-
 }

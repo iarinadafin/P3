@@ -11,17 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service android:name=".MyFirebaseInstanceIDService">
+        <service
+            android:name=".MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-        <service android:name=".MyFirebaseMessagingService">
+        <service
+            android:name=".MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -40,10 +41,6 @@
         <activity android:name=".ViewMeetingActivity">
         </activity>
         <activity android:name=".CreateMeetingActivity">
-        </activity>
-        <activity android:name=".ChatsListActivity">
-        </activity>
-        <activity android:name=".ChatActivity">
         </activity>
     </application>
 

@@ -237,5 +237,4 @@
     <string name="time_format_create">%1$s:%2$s</string>
     <string name="confirm_meeting_create">Submit</string>
 
-    <string name="chats_list_title">Your messages:</string>
 </resources>
