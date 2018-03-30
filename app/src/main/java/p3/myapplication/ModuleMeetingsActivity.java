@@ -93,7 +93,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 
 			// checks if current user is a member of this meeting
 			Boolean isMember = false;
-			if (data.child("members/" + mAuth.getUid()).exists())
+			if (data.child("members/" + mAuth.getCurrentUser().getUid()).exists())
 				isMember = true;
 
 			// sends all meeting details
@@ -104,7 +104,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 										data.getKey(), // key of database reference [4]
 										module, // name of the meeting module [5]
 										isMember.toString(), // if current user is a member [6]
-										mAuth.getUid()}; // current user id [7]
+										mAuth.getCurrentUser().getUid()}; // current user id [7]
 			list.add(meetingDetails);
 		}
 

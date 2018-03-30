@@ -26,13 +26,14 @@ class Intentions {
 	}
 
 	void goToMessages () {
-		Intent i = new Intent(c, MainActivity.class);
+		Intent i = new Intent(c, ChatsListActivity.class);
 		c.startActivity(i);
 	}
 
 	void goToProfile () {
-		Intent i = new Intent(c, MainActivity.class);
-		c.startActivity(i);
+		//Intent i = new Intent(c, MainActivity.class);
+		//c.startActivity(i);
+		FirebaseAuth.getInstance().signOut();
 	}
 
 	void goToViewMeeting (String meetingID, String module, String dateString, String hoursString) {

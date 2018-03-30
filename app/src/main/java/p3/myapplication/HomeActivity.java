@@ -48,7 +48,8 @@ public class HomeActivity extends AppCompatActivity {
 						return true;
 					}
 					case R.id.action_profile: {
-						intentions.goToProfile();
+						mAuth.signOut();
+						intentions.goToSignIn();
 						return true;
 					}
 				}

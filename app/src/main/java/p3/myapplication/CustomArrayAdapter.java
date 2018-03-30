@@ -3,6 +3,7 @@ package p3.myapplication;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,7 +83,7 @@ public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 																			// ^ syntax plurality check
 		// import and set listeners on buttons
 		Button viewButton = listItem.findViewById(R.id.viewButton);
-		Button joinOrMessageButton = listItem.findViewById(R.id.secondaryButton);
+		final Button joinOrMessageButton = listItem.findViewById(R.id.secondaryButton);
 
 		viewButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -97,6 +98,7 @@ public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 			// todo: set listener for messaging
 		}
 		else {
+			joinOrMessageButton.setTextColor(context.getColor(R.color.colorAccent));
 			joinOrMessageButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

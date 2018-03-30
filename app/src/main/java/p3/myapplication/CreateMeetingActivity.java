@@ -20,8 +20,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Formatter;
+import java.util.Locale;
 
 public class CreateMeetingActivity extends AppCompatActivity {
 
@@ -45,11 +52,15 @@ public class CreateMeetingActivity extends AppCompatActivity {
 	int currentYear = calendar.get(Calendar.YEAR);
 	int currentMonth = calendar.get(Calendar.MONTH);
 	int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-	int nextHour = calendar.get(Calendar.HOUR + 1);
+	int nextHour = calendar.get(Calendar.HOUR_OF_DAY + 1);
 	int defaultMinute = 0;
 	int selectedDay = currentDay;
 	int selectedMonth = currentMonth;
 	int selectedYear = currentYear;
+	int selectedStartHour = nextHour;
+	int selectedStartMinute = defaultMinute;
+	int selectedEndHour = nextHour + 1;
+	int selectedEndMinute = defaultMinute;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +80,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
 		// sets date picker to now
 		setDateLabel(currentYear, currentMonth, currentDay);
-		Log.d("mytag", "Date label at initialisation: " + dateLabel.getText().toString());
+		setTimeLabel(startTimeLabel, selectedStartHour, defaultMinute);
+		setTimeLabel(endTimeLabel, selectedEndHour, defaultMinute);
 
 		// date picker dialog button
 		chooseDate.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +99,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				TimePickerDialog dialog = new TimePickerDialog(CreateMeetingActivity.this,
-						startTimeSetListener, nextHour, defaultMinute, true);
+						startTimeSetListener, selectedStartHour, selectedStartMinute, true);
 				dialog.show();
 			}
 		});
@@ -97,7 +109,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				TimePickerDialog dialog = new TimePickerDialog(CreateMeetingActivity.this,
-						endTimeSetListener, nextHour + 1, defaultMinute, true);
+						endTimeSetListener, selectedEndHour, selectedEndMinute, true);
 				dialog.show();
 			}
 		});
@@ -111,7 +123,6 @@ public class CreateMeetingActivity extends AppCompatActivity {
 				selectedDay = dayOfMonth;
 
 				setDateLabel(year, month, dayOfMonth);
-				Log.d("mytag", "Date label before selection: " + dateLabel.getText().toString());
 			}
 		};
 
@@ -119,6 +130,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		startTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+				selectedStartHour = hourOfDay;
+				selectedStartMinute = minute;
+
 				setTimeLabel(startTimeLabel, hourOfDay, minute);
 			}
 		};
@@ -127,26 +141,31 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		endTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+				selectedEndHour = hourOfDay;
+				selectedEndMinute = minute;
+
 				setTimeLabel(endTimeLabel, hourOfDay, minute);
 			}
 		};
 
-		// check data!
+		// confirms and moves to the module meeting list
 		submit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (verifyData(selectedYear, selectedMonth, selectedDay)) {
-					String startDate = selectedYear + "-" + checkExtraZero(selectedMonth) + "-" + selectedDay + " " + startTimeLabel.getText();
-					String endDate = selectedYear + "-" + checkExtraZero(selectedMonth) + "-" + selectedDay + " " + endTimeLabel.getText();
+			if (verifyData(startTimeLabel.getText().toString(), endTimeLabel.getText().toString())) {
+				String startDate = selectedYear + "-" + checkExtraZero(selectedMonth) + "-" + selectedDay + " " + startTimeLabel.getText();
+				String endDate = selectedYear + "-" + checkExtraZero(selectedMonth) + "-" + selectedDay + " " + endTimeLabel.getText();
 
-					String pushKey = reference.child("meetings/" + moduleName).push().getKey();
-					// sets all meeting information
-					reference.child("meetings/" + moduleName + "/" + pushKey).setValue(new Meeting(meetingName.getText().toString(), startDate, endDate));
-					reference.child("meetings/" + moduleName + "/" + pushKey + "/members/" + mAuth.getUid()).setValue("true");
-					// sets user meeting participation
-					reference.child("users/" + mAuth.getUid() + "/meetings/" + pushKey).setValue("true");
-				}
-				else {}
+				String pushKey = reference.child("meetings/" + moduleName).push().getKey();
+				// sets all meeting information
+				reference.child("meetings/" + moduleName + "/" + pushKey).setValue(new Meeting(meetingName.getText().toString(), startDate, endDate));
+				reference.child("meetings/" + moduleName + "/" + pushKey + "/members/" + mAuth.getCurrentUser().getUid()).setValue("true");
+				// sets user meeting participation
+				reference.child("users/" + mAuth.getCurrentUser().getUid() + "/meetings/" + pushKey).setValue("true");
+			}
+			else {
+				Toast.makeText(CreateMeetingActivity.this, "Please review your details.", Toast.LENGTH_SHORT).show();
+			}
 			}
 		});
 	}
@@ -172,9 +191,23 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		return Integer.toString(number);
 	}
 
-	boolean verifyData (int year, int month, int day) {
+	boolean verifyData (String startTime, String endTime) {
+		try {
+			Date startTimeDate = new SimpleDateFormat("HH:mm", Locale.UK).parse(startTime);
+			Date endTimeDate = new SimpleDateFormat("HH:mm", Locale.UK).parse(endTime);
 
-		return true;
+			if (startTimeDate.before(endTimeDate))
+				return true;
+			else
+				endTimeLabel.setError("");
+			if (!meetingName.getText().toString().isEmpty())
+				return true;
+			else
+				meetingName.setError("Required!");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	public void onStart() {
