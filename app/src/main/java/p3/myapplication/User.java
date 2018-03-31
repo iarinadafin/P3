@@ -41,7 +41,7 @@ class User {
 		this.lastName = lastName;
 	}
 
-	public String getEmail() {
+	String getEmail() {
 		return email;
 	}
 
@@ -49,7 +49,7 @@ class User {
 		this.email = email;
 	}
 
-	public String getCourse() {
+	String getCourse() {
 		return course;
 	}
 
@@ -57,7 +57,7 @@ class User {
 		this.course = course;
 	}
 
-	public int getYear() {
+	int getYear() {
 		return year;
 	}
 

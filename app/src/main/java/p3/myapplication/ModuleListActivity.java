@@ -84,13 +84,9 @@ public class ModuleListActivity extends AppCompatActivity {
 		super.onStop();
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	public Pair<String, Integer> getUserCourse (DataSnapshot dataSnapshot) {
-		final String userID = currentUser.getUid();
-
-		for (DataSnapshot data : dataSnapshot.getChildren()) {
-			return new Pair<> (dataSnapshot.getValue(User.class).getCourse(), dataSnapshot.getValue(User.class).getYear());
-		}
-		return null;
+		return new Pair<> (dataSnapshot.getValue(User.class).getCourse(), dataSnapshot.getValue(User.class).getYear());
 	}
 
 	public void customiseModules (String course, int year) {

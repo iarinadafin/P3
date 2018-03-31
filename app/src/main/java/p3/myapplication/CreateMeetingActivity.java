@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -14,22 +13,14 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -61,6 +52,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 	int selectedEndHour = 10;
 	int selectedEndMinute = 0;
 
+	@SuppressWarnings("ConstantConditions")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,7 +80,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
 			public void onClick(View v) {
 				DatePickerDialog dialog = new DatePickerDialog(CreateMeetingActivity.this,
 						dateSetListener, selectedYear, selectedMonth, selectedDay);
-				dialog.getDatePicker().setMinDate(System.currentTimeMillis());
+
+				long now = Calendar.getInstance().getTimeInMillis() + 3600000;
+				dialog.getDatePicker().setMinDate(now);
 				dialog.show();
 			}
 		});
@@ -154,7 +148,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 				String startDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + selectedDay + " " + startTimeLabel.getText();
 				String endDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + selectedDay + " " + endTimeLabel.getText();
 
-				if (verifyData(startDate, startTimeLabel.getText().toString(), endTimeLabel.getText().toString())) {
+				if (verifyData(startDate, endDate, startTimeLabel.getText().toString(), endTimeLabel.getText().toString())) {
 					String pushKey = reference.child("meetings/" + moduleName).push().getKey();
 					// sets all meeting information
 					reference.child("meetings/" + moduleName + "/" + pushKey).setValue(new Meeting(meetingName.getText().toString(), startDate, endDate));
@@ -211,14 +205,21 @@ public class CreateMeetingActivity extends AppCompatActivity {
 				new SimpleDateFormat("yyyy", Locale.UK).format(dateObject)); // year
 	}
 
-	boolean verifyData (String startDate, String startTime, String endTime) {
+	boolean verifyData (String startDate, String endDate, String startTime, String endTime) {
 		boolean check = true;
 		try {
 			Date startTimeDate = new SimpleDateFormat("HH:mm", Locale.UK).parse(startTime);
 			Date endTimeDate = new SimpleDateFormat("HH:mm", Locale.UK).parse(endTime);
 
-			// checks if start time is after end time; if so, throws UI error
-			if (startTimeDate.after(endTimeDate)) {
+			// checks if start time is in the past
+			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
+			calendar.add(Calendar.HOUR_OF_DAY, 1);
+			if (new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(startDate).before(calendar.getTime())) {
+				startTimeLabel.setError("");
+				check = false;
+			}
+			// checks if start time is after end time or if end time is in the past; if so, throws UI error
+			if (startTimeDate.after(endTimeDate) || new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(endDate).before(calendar.getTime())) {
 				endTimeLabel.setError("");
 				check = false;
 			}
@@ -227,12 +228,6 @@ public class CreateMeetingActivity extends AppCompatActivity {
 				meetingName.setError("Required!");
 				check = false;
 			}
-			// checks if start time is in the past
-			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
-			calendar.add(Calendar.HOUR_OF_DAY, 1);
-			calendar.add(Calendar.DAY_OF_MONTH, -1);
-			if (new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(startDate).before(calendar.getTime()))
-				check = false;
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

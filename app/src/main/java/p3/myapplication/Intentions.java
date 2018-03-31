@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 class Intentions {
 
-	Context c;
+	private Context c;
 
 	Intentions (Context c) {
 		this.c = c;
@@ -20,7 +20,7 @@ class Intentions {
 		c.startActivity(i);
 	}
 
-	void goHome () {
+	private void goHome () {
 		Intent i = new Intent(c, HomeActivity.class);
 		c.startActivity(i);
 	}

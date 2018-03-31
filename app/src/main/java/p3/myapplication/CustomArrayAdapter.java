@@ -2,10 +2,7 @@ package p3.myapplication;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +22,12 @@ import java.util.Locale;
 
 public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 
-	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+	private DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	private Context context;
 	private List<String[]> values = new ArrayList<>();
 
-	public CustomArrayAdapter (int resource, Context context, List<String[]> values) {
+	CustomArrayAdapter (int resource, Context context, List<String[]> values) {
 		super(context, resource , values);
 		this.context = context;
 		this.values = values;
@@ -39,8 +36,8 @@ public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 	@SuppressLint("ViewHolder")
 	@NonNull
 	@Override
-	public View getView (final int position, @NonNull final View convertView, @NonNull ViewGroup parent) {
-		View listItem = convertView;
+	public View getView (final int position, final View convertView, @NonNull ViewGroup parent) {
+		View listItem;
 
 		// handles null list of values
 		listItem = LayoutInflater.from(context).inflate(R.layout.row_item, parent, false);

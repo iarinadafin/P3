@@ -95,21 +95,10 @@ public class HomeActivity extends AppCompatActivity {
 		});
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	public void showData (DataSnapshot dataSnapshot) {
-		final String userID = currentUser.getUid();
-		User user;
-
-		for (DataSnapshot data : dataSnapshot.getChildren()) {
-			user = dataSnapshot.getValue(User.class);
-			user.setCourse(dataSnapshot.getValue(User.class).getCourse());
-			user.setEmail(dataSnapshot.getValue(User.class).getEmail());
-			user.setFirstName(dataSnapshot.getValue(User.class).getFirstName());
-			user.setLastName(dataSnapshot.getValue(User.class).getLastName());
-			user.setYear(dataSnapshot.getValue(User.class).getYear());
-
-			String message = String.format(getResources().getString(R.string.welcome_message), user.getFirstName());
-			welcomeMessage.setText(message);
-		}
+		String message = String.format(getResources().getString(R.string.welcome_message), dataSnapshot.child("firstName").getValue(String.class));
+		welcomeMessage.setText(message);
 	}
 
 	public void goToCreateMeeting () {

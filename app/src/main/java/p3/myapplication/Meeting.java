@@ -1,12 +1,13 @@
 package p3.myapplication;
 
+@SuppressWarnings("unused")
 public class Meeting {
 
 	private String name;
 	private String startDate;
 	private String endDate;
 
-	public Meeting (String name, String startDate, String endDate) {
+	Meeting (String name, String startDate, String endDate) {
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
