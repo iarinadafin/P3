@@ -6,6 +6,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,6 +32,9 @@ public class ModuleListActivity extends AppCompatActivity {
 
 	ListView modulesList;
 
+	ArrayAdapter<String> itemsAdapter;
+	String[] moduleArray;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,18 +50,34 @@ public class ModuleListActivity extends AppCompatActivity {
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-				return new Intentions(ModuleListActivity.this).chooseMenuItem(item);
+				Intentions intentions = new Intentions(ModuleListActivity.this);
+				switch (item.getItemId()) {
+					case R.id.action_home: {
+						intentions.goHome();
+						return false;
+					}
+					case R.id.action_messages: {
+						intentions.goToMessages();
+						return false;
+					}
+					case R.id.action_profile: {
+						mAuth.signOut();
+						intentions.goToSignIn();
+						return false;
+					}
+				}
+				return false;
 			}
 		});
 		navigation.getMenu().findItem(navigation.getSelectedItemId()).setCheckable(false);
 
-		reference.child("users").child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+		reference.child("users/" + currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				Pair userCourseData = getUserCourse(dataSnapshot);
+				Pair<String, String> userCourseData = getUserCourse(dataSnapshot);
 
-				String course = (String) userCourseData.first;
-				int year = (int) userCourseData.second;
+				String course = userCourseData.first;
+				int year = Integer.parseInt(userCourseData.second);
 
 				customiseModules(course, year);
 			}
@@ -84,9 +104,8 @@ public class ModuleListActivity extends AppCompatActivity {
 		super.onStop();
 	}
 
-	@SuppressWarnings("ConstantConditions")
-	public Pair<String, Integer> getUserCourse (DataSnapshot dataSnapshot) {
-		return new Pair<> (dataSnapshot.getValue(User.class).getCourse(), dataSnapshot.getValue(User.class).getYear());
+	public Pair<String, String> getUserCourse (DataSnapshot dataSnapshot) {
+		return new Pair<> (dataSnapshot.child("course").getValue(String.class), dataSnapshot.child("year").getValue(String.class));
 	}
 
 	public void customiseModules (String course, int year) {
@@ -128,9 +147,6 @@ public class ModuleListActivity extends AppCompatActivity {
 	}
 	
 	public void setModuleValues (int resource, boolean compSciY2) {
-		ArrayAdapter<String> itemsAdapter;
-		String[] moduleArray;
-
 		// adds an extra module for comp sci yr 2
 		if (compSciY2) {
 			List<String> tempList = Arrays.asList(getResources().getStringArray(resource));

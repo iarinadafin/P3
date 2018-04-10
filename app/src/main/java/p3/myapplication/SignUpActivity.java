@@ -72,8 +72,8 @@ public class SignUpActivity extends Activity {
 				if (validateForm(passwordField.getText().toString(), confirmPasswordField.getText().toString())) {
 					progressBar.setVisibility(View.VISIBLE);
 
-					int yearValue = Integer.parseInt(((RadioButton) findViewById(yearRadioGroup.getCheckedRadioButtonId())).getText().toString());
-					user = new User(firstNameField.getText().toString(), lastNameField.getText().toString(), courseSpinner.getSelectedItem().toString(), yearValue, emailField.getText().toString());
+					//int yearValue = Integer.parseInt(((RadioButton) findViewById(yearRadioGroup.getCheckedRadioButtonId())).getText().toString());
+					user = new User(firstNameField.getText().toString(), lastNameField.getText().toString(), courseSpinner.getSelectedItem().toString(), ((RadioButton) findViewById(yearRadioGroup.getCheckedRadioButtonId())).getText().toString(), emailField.getText().toString());
 
 					signUp(passwordField.getText().toString());
 				}

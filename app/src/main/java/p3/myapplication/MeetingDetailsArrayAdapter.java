@@ -3,6 +3,7 @@ package p3.myapplication;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,24 +11,27 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class CustomArrayAdapter extends ArrayAdapter<String[]> {
+public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 
 	private DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	private Context context;
 	private List<String[]> values = new ArrayList<>();
+	private Intentions helper;
 
-	CustomArrayAdapter (int resource, Context context, List<String[]> values) {
+	MeetingDetailsArrayAdapter(int resource, Context context, List<String[]> values) {
 		super(context, resource , values);
 		this.context = context;
 		this.values = values;
@@ -40,7 +44,9 @@ public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 		View listItem;
 
 		// handles null list of values
-		listItem = LayoutInflater.from(context).inflate(R.layout.row_item, parent, false);
+		listItem = LayoutInflater.from(context).inflate(R.layout.meeting_details_row_item, parent, false);
+
+		helper = new Intentions(context);
 
 		// import all fields that need to be populated in a card
 		TextView title = listItem.findViewById(R.id.titleLabel);
@@ -53,9 +59,11 @@ public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 		String[] endTokens = values.get(position)[2].split("[-|\\s]");
 
 		// format string into date
-		Date dateObject = new Date();
+		Date startDate = new Date();
+		Date endDate = new Date();
 		try {
-			dateObject = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(values.get(position)[1]);
+			startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(values.get(position)[1]);
+			endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(values.get(position)[2]);
 		}
 		catch (ParseException e) {
 			e.printStackTrace();
@@ -65,10 +73,10 @@ public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 		final String hoursString = startTokens[3] + " - " + endTokens[3];
 		// sets the date string resource in the [dayOfTheWeek, month day, year] format
 		final String dateString = context.getResources().getString(R.string.date_field, // date resource
-				new SimpleDateFormat("EEE", Locale.UK).format(dateObject), // friendly short day of week
-				new SimpleDateFormat("MMM", Locale.UK).format(dateObject), // friendly short month
-				new SimpleDateFormat("dd", Locale.UK).format(dateObject), // day of month
-				new SimpleDateFormat("yyyy", Locale.UK).format(dateObject)); // year
+				new SimpleDateFormat("EEE", Locale.UK).format(startDate), // friendly short day of week
+				new SimpleDateFormat("MMM", Locale.UK).format(startDate), // friendly short month
+				new SimpleDateFormat("dd", Locale.UK).format(startDate), // day of month
+				new SimpleDateFormat("yyyy", Locale.UK).format(startDate)); // year
 
 		// gets number of participants as int
 		int noOfParticipants = Integer.parseInt(values.get(position)[3]);
@@ -85,26 +93,60 @@ public class CustomArrayAdapter extends ArrayAdapter<String[]> {
 		viewButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new Intentions(context).goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString);
+				helper.goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString);
 			}
 		});
 
+		// calculates the current date and time
+		Calendar calendar = Calendar.getInstance(Locale.UK);
+		calendar.add(Calendar.HOUR_OF_DAY, 1);
+
 		// sets message / join button according to user participation
+		// if user is meeting participant
 		if (Boolean.parseBoolean(values.get(position)[6])) {
-			joinOrMessageButton.setText(R.string.message_button);
-			// todo: set listener for messaging
+			// checks if the meeting has more than one participant and if the endTime for the meeting has passed
+			// in which case, it will change the message button into an end meeting button
+			if (noOfParticipants > 1 && endDate.before(calendar.getTime())) {
+				joinOrMessageButton.setText(R.string.end_button);
+				joinOrMessageButton.setTextColor(context.getColor(R.color.colorAccent));
+
+				// NOTE: despite the name, it here has the function of ending the meeting
+				joinOrMessageButton.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						helper.goToRating(values.get(position)[4], values.get(position)[0]);
+					}
+				});
+			}
+			// if the end date has not passed
+			else {
+				joinOrMessageButton.setText(R.string.message_button);
+				joinOrMessageButton.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						new Intentions(context).goToChat(values.get(position)[4], values.get(position)[0]);
+					}
+				});
+			}
 		}
+		// if user is not a meeting participant
 		else {
 			joinOrMessageButton.setTextColor(context.getColor(R.color.colorAccent));
 			joinOrMessageButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					// add user to members of meeting and the meeting in the user participation list
-					reference.child("meetings/" + values.get(position)[5] + "/" + values.get(position)[4] + "/members/" + values.get(position)[7]).setValue("true");
-					// module							// meeting								// user id
+					reference.child("meetings/" + values.get(position)[4] + "/members/" + values.get(position)[7]).setValue("true");
+					// meeting								// user id
 					reference.child("users/" + values.get(position)[7] + "/meetings/" + values.get(position)[4]).setValue("true");
 					// user id								// meeting
-					new Intentions(context).goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString);
+					helper.goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString);
+
+					Calendar calendar = Calendar.getInstance(Locale.UK);
+					calendar.add(Calendar.HOUR_OF_DAY, 1);
+					reference.child("chats/" + values.get(position)[4]).push().setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
+																								"system",
+																								values.get(position)[8] + " joined"));
 				}
 			});
 		}

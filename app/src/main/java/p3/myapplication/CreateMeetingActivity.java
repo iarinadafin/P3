@@ -13,8 +13,11 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
@@ -28,8 +31,6 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
 	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 	FirebaseAuth mAuth = FirebaseAuth.getInstance();
-	String moduleName;
-	Intentions intentions = new Intentions(this);
 
 	EditText meetingName;
 	TextView dateLabel;
@@ -51,6 +52,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
 	int selectedStartMinute = 0;
 	int selectedEndHour = 10;
 	int selectedEndMinute = 0;
+	String moduleName;
+	String pushKey = reference.child("meetings/" + moduleName).push().getKey();
+	Intentions intentions = new Intentions(this);
 
 	@SuppressWarnings("ConstantConditions")
 	@Override
@@ -145,16 +149,34 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		submit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String startDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + selectedDay + " " + startTimeLabel.getText();
-				String endDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + selectedDay + " " + endTimeLabel.getText();
+				String startDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + checkExtraZero(selectedDay) + " " + startTimeLabel.getText();
+				String endDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + checkExtraZero(selectedDay) + " " + endTimeLabel.getText();
 
 				if (verifyData(startDate, endDate, startTimeLabel.getText().toString(), endTimeLabel.getText().toString())) {
-					String pushKey = reference.child("meetings/" + moduleName).push().getKey();
 					// sets all meeting information
-					reference.child("meetings/" + moduleName + "/" + pushKey).setValue(new Meeting(meetingName.getText().toString(), startDate, endDate));
-					reference.child("meetings/" + moduleName + "/" + pushKey + "/members/" + mAuth.getCurrentUser().getUid()).setValue("true");
+					reference.child("meetings/" + pushKey).setValue(new Meeting(meetingName.getText().toString(), startDate, endDate, moduleName));
+					reference.child("meetings/" + pushKey + "/members/" + mAuth.getCurrentUser().getUid()).setValue("true");
 					// sets user meeting participation
 					reference.child("users/" + mAuth.getCurrentUser().getUid() + "/meetings/" + pushKey).setValue("true");
+					// sets the system message that the user joined the chat
+					reference.addListenerForSingleValueEvent(new ValueEventListener() {
+						@Override
+						public void onDataChange(DataSnapshot dataSnapshot) {
+							calendar = Calendar.getInstance(Locale.UK);
+							calendar.add(Calendar.HOUR_OF_DAY, 1);
+							reference.child("chats/" + pushKey).push().setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
+																							"system",
+																							dataSnapshot.child("users/" + mAuth.getCurrentUser().getUid() + "/firstName").getValue(String.class) + " joined"));
+							// increases user points
+							int score = Integer.parseInt(dataSnapshot.child("users/" + mAuth.getCurrentUser().getUid() + "/score").getValue(String.class));
+							reference.child("users/" + mAuth.getCurrentUser().getUid() + "/score").setValue(String.valueOf(score + 10));
+						}
+
+						@Override
+						public void onCancelled(DatabaseError databaseError) {
+
+						}
+					});
 
 					// goes to view meeting after creation
 					intentions.goToViewMeeting(pushKey,

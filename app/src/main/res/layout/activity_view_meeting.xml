@@ -5,67 +5,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="p3.myapplication.ViewMeetingActivity">
+    tools:layout_editor_absoluteY="25dp">
 
     <LinearLayout
+        android:id="@+id/viewPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="56dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/meetingTitleView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:fontFamily="sans-serif-condensed"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold"/>
 
-            <TextView
-                android:id="@+id/meetingTitleView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fillViewport="true"
-                android:fontFamily="sans-serif-condensed"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="16dp"/>
-
-            <TextView
-                android:id="@+id/meetingModuleView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fillViewport="true"
-                android:fontFamily="sans-serif-condensed"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textSize="18sp"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="16dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/meetingModuleView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="56dp"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-condensed"
+            android:textAlignment="center"
+            android:textSize="18sp"/>
+
+        <LinearLayout
+            android:id="@+id/manageMeetingPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <Button
-                android:id="@+id/messageJoinButtonView"
+                android:id="@+id/messageButtonView"
                 android:layout_width="wrap_content"
                 android:layout_height="42dp"
                 android:layout_weight="1"
@@ -76,58 +52,47 @@
                 android:layout_width="wrap_content"
                 android:layout_height="42dp"
                 android:layout_weight="1"
-                android:text="@string/edit_meeting"
-                tools:clickable="false"
-                android:clickable="false"/>
-
-            <Button
-                android:id="@+id/cancelButtonView"
-                android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:text="@string/cancel_meeting"
-                android:clickable="false"/>
+                android:text="@string/edit_meeting"/>
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/leaveMeetingButtonView"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:text="@string/leave_meeting"/>
+
+        <Button
+            android:id="@+id/joinMeetingButtonView"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:text="@string/join_meeting"/>
+
+        <Button
+            android:id="@+id/endMeetingButtonView"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:text="@string/end_meeting"/>
+
+        <TextView
+            android:id="@+id/participantsLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:paddingTop="8dp"
+            android:text="@string/participants_label"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="-58dp">
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:text="@string/leave_meeting"
-                android:textColor="@color/colorAccent"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="8dp">
-
-            <TextView
-                android:id="@+id/participantsLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fillViewport="true"
-                android:fontFamily="sans-serif-condensed"
-                android:text="@string/participants_label"
-                android:textAlignment="viewStart"
-                android:textAllCaps="false"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="16dp"/>
+            android:orientation="vertical">
 
             <ListView
                 android:id="@+id/participantsListView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:divider="#b5b5b5"
                 android:dividerHeight="1dp"
                 android:paddingEnd="16dp"

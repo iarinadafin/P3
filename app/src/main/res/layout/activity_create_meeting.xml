@@ -5,12 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="p3.myapplication.CreateMeetingActivity">
+    tools:context="p3.myapplication.CreateMeetingActivity"
+    tools:layout_editor_absoluteY="25dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="72dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -129,22 +135,26 @@
                     android:id="@+id/chooseEndTimeButton"
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
-                    android:paddingStart="16dp"
                     android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
                     android:text="@string/choose_end_time"/>
 
             </LinearLayout>
         </ScrollView>
 
-        <Button
-            android:id="@+id/confirmCreate"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/confirm_meeting_create"
-            android:textSize="18sp"/>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/confirmCreate"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:text="@string/confirm_meeting_create"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

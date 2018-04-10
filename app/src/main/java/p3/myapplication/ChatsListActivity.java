@@ -1,9 +1,7 @@
 package p3.myapplication;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,7 +19,8 @@ public class ChatsListActivity extends AppCompatActivity {
 
 	ListView chatsList;
 
-	ArrayList<String> userChatsList = new ArrayList<>();
+	ArrayList<String[]> userChatsList = new ArrayList<>();
+	String userUid = FirebaseAuth.getInstance().getUid();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +29,17 @@ public class ChatsListActivity extends AppCompatActivity {
 
 		chatsList = findViewById(R.id.chatsListMessages);
 
-		reference.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/meetings").addValueEventListener(new ValueEventListener() {
+		reference.addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				for (DataSnapshot data : dataSnapshot.getChildren())
-					userChatsList.add(data.getKey());
+				for (DataSnapshot meeting : dataSnapshot.child("meetings").getChildren()) {
+					// checks if the meeting has the user as a participant and if the chat of the meeting has any messages
+					//														   if not, the chat will not be displayed in the chats list
+					if (meeting.child("members/" + userUid).exists() && dataSnapshot.child("chats/" + meeting.getKey()).exists())
+						userChatsList.add(new String[] {meeting.getKey(), meeting.child("name").getValue(String.class)});
+
+				}
+				displayChats();
 			}
 
 			@Override
@@ -54,30 +59,8 @@ public class ChatsListActivity extends AppCompatActivity {
 		super.onStop();
 	}
 
-	public void getMeetings (final String meetingKey) {
-		reference.child("meetings").addValueEventListener(new ValueEventListener() {
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot) {
-				for (DataSnapshot category : dataSnapshot.getChildren())
-					for (DataSnapshot meeting : category.getChildren())
-						if (meeting.getKey().equals(meetingKey)) {
-							userChatsList.add(meeting.child("name").getValue(String.class));
-							break;
-						}
-			}
-
-			@Override
-			public void onCancelled(DatabaseError databaseError) {
-
-			}
-		});
-	}
-
 	public void displayChats () {
-		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userChatsList);
-
-		Log.d("mytag", String.valueOf(userChatsList.size()));
-
+		MeetingChatArrayAdapter adapter = new MeetingChatArrayAdapter(0, this, userChatsList);
 		chatsList.setAdapter(adapter);
 	}
 }

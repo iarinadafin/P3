@@ -6,11 +6,13 @@ public class Meeting {
 	private String name;
 	private String startDate;
 	private String endDate;
+	private String module;
 
-	Meeting (String name, String startDate, String endDate) {
+	Meeting (String name, String startDate, String endDate, String module) {
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.module = module;
 	}
 
 	public String getName() {
@@ -35,5 +37,13 @@ public class Meeting {
 
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
+	}
+
+	public String getModule() {
+		return module;
+	}
+
+	public void setModule(String module) {
+		this.module = module;
 	}
 }

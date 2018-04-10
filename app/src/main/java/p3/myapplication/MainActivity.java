@@ -105,20 +105,36 @@ public class MainActivity extends Activity {
 		final String email = emailLoginField.getText().toString();
 		String password = passwordLoginField.getText().toString();
 
-		mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-			@Override
-			public void onComplete(@NonNull Task<AuthResult> task) {
-				if (task.isSuccessful()) {
-					// Sign in success, update UI with the signed-in user's information
-					Log.d("mytag", "signInWithEmail:success");
-					goHome();
-				} else {
-					// If sign in fails, display a message to the user.
-					Log.w("mytag", "signInWithEmail:failure", task.getException());
-					Toast.makeText(MainActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+		if (verifyFields(email, password))
+			mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+				@Override
+				public void onComplete(@NonNull Task<AuthResult> task) {
+					if (task.isSuccessful()) {
+						// if sign in success, update UI
+						Log.d("mytag", "signInWithEmail:success");
+						goHome();
+					} else {
+						// if sign in fails, display a message
+						Log.w("mytag", "signInWithEmail:failure", task.getException());
+						Toast.makeText(MainActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+					}
 				}
-			}
-		});
+			});
+
+	}
+
+	public boolean verifyFields (String email, String password) {
+		Boolean check = true;
+		if (email.equals("")) {
+			emailLoginField.setError("Required!");
+			check = false;
+		}
+		if (password.equals("")) {
+			passwordLoginField.setError("Required!");
+			check = false;
+		}
+
+		return check;
 	}
 
 	public void goHome () {

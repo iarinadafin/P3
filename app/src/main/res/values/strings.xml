@@ -29,6 +29,8 @@
 
     <string name="welcome_message">Welcome back, %s!</string>
     <string name="create_meeting_button">Set up a meeting</string>
+    <string name="your_meetings_label">Your meetings:</string>
+    <string name="no_meetings_home_label">You have not joined any meetings.</string>
 
     <string name="choose_module_label">Choose a module:</string>
     <!-- electro eng -->
@@ -208,7 +210,8 @@
     <string name="view_button">View</string>
     <string name="message_button">Message</string>
     <string name="join_button">Join</string>
-    <string name="leave_meeting">Leave meeting</string>
+    <string name="end_button">End</string>
+    <string name="join_meeting">Join meeting</string>
     <string name="date_field">%1$s, %2$s %3$s, %4$s</string>
     <plurals name="no_of_participants">
         <item quantity="one">1 participant joined</item>
@@ -220,7 +223,8 @@
     <string name="title_notifications">Notifications</string>
 
     <string name="edit_meeting">Edit</string>
-    <string name="cancel_meeting">Cancel</string>
+    <string name="leave_meeting">Leave meeting</string>
+    <string name="end_meeting">End meeting</string>
     <string name="participants_label">Participants</string>
     <string name="details_label">Details</string>
     <string name="date_label">Date</string>
@@ -237,4 +241,12 @@
     <string name="time_format_create">%1$s:%2$s</string>
     <string name="confirm_meeting_create">Submit</string>
 
+    <string name="chats_list_title">Your messages:</string>
+    <string name="last_message_sender">%s:\u0020</string>
+
+    <string name="user_joined_or_left_message">%s the chat</string>
+    <string name="message_typing_hint">Type a message&#8230;</string>
+
+    <string name="meeting_rating_title">Rate this meeting</string>
+    <string name="absence_checkbox">Absent?</string>
 </resources>
