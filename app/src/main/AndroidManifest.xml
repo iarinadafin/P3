@@ -47,6 +47,8 @@
         </activity>
         <activity android:name=".RatingActivity">
         </activity>
+        <activity android:name=".UserProfileActivity">
+        </activity>
     </application>
 
 </manifest>

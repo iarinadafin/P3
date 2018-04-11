@@ -60,6 +60,7 @@ public class ChatsListActivity extends AppCompatActivity {
 	}
 
 	public void displayChats () {
+		userChatsList.clear();
 		MeetingChatArrayAdapter adapter = new MeetingChatArrayAdapter(0, this, userChatsList);
 		chatsList.setAdapter(adapter);
 	}

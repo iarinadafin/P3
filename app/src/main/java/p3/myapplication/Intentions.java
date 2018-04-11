@@ -34,7 +34,7 @@ class Intentions {
 	}
 
 	void goToProfile () {
-		Intent i = new Intent(c, MainActivity.class);
+		Intent i = new Intent(c, UserProfileActivity.class);
 		c.startActivity(i);
 	}
 
@@ -79,11 +79,10 @@ class Intentions {
 		return false;
 	}
 
+	// used
 	void deleteMeeting (String userID, DatabaseReference reference, DataSnapshot snapshot, String meetingID) {
 		reference.child("meetings/" + meetingID).removeValue();
 		reference.child("users/" + userID + "/meetings/" + meetingID).removeValue();
 		reference.child("chats/" + meetingID).removeValue();
-		reference.child("users/" + userID + "/score")
-				.setValue(Integer.parseInt(snapshot.child("users/" + userID + "/score").getValue(String.class)) - 5);
 	}
 }

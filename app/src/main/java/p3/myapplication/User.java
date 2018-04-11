@@ -9,15 +9,16 @@ class User {
 
 	private String firstName;
 	private String lastName;
-	private String course; // todo: may change data structure for course name
+	private String course;
 	private String year;
 	private String email;
 	private String picURL;
 	private String score;
+	private String numberOfRatings;
+	private String totalScore;
 
 	public User () {}
 
-	// todo: update for all fields
 	User (String firstName, String lastName, String course, String year, String email) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -25,6 +26,8 @@ class User {
 		this.year = year;
 		this.email = email;
 		this.score = "0";
+		this.totalScore = "0";
+		this.numberOfRatings = "0";
 	}
 
 	public String getFirstName() {
@@ -73,5 +76,21 @@ class User {
 
 	public void setScore(String score) {
 		this.score = score;
+	}
+
+	public String getTotalScore() {
+		return totalScore;
+	}
+
+	public void setTotalScore(String totalScore) {
+		this.totalScore = totalScore;
+	}
+
+	public String getNumberOfRatings() {
+		return numberOfRatings;
+	}
+
+	public void setNumberOfRatings(String numberOfRatings) {
+		this.numberOfRatings = numberOfRatings;
 	}
 }

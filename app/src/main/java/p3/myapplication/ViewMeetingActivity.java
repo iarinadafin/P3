@@ -180,6 +180,9 @@ public class ViewMeetingActivity extends AppCompatActivity {
 									// if current user is the only participant
 									if (dataSnapshot.child("meetings/" + meetingID + "/members").getChildrenCount() <= 1) {
 										helper.deleteMeeting(FirebaseAuth.getInstance().getCurrentUser().getUid(), reference, dataSnapshot, meetingID);
+										// subtract 10 points if meeting is left
+										reference.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/score")
+												.setValue(Integer.parseInt(dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/score").getValue(String.class)) - 10);
 										// redirects the user to the home page
 										helper.goHome();
 									}

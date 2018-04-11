@@ -49,7 +49,7 @@ public class RatingActivity extends AppCompatActivity {
 
 		meetingID = getIntent().getExtras().getString("p3.myapplication:meeting_id");
 
-		reference.addValueEventListener(new ValueEventListener() {
+		reference.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				showData(dataSnapshot);
@@ -80,7 +80,7 @@ public class RatingActivity extends AppCompatActivity {
 			public void onClick(View v) {
 				// iterate through listview items -> through user ratings
 				for (int i=0; i<adapter.getCount(); i++) {
-					View listItem = userRatings.getChildAt(0);
+					View listItem = userRatings.getChildAt(i);
 					CheckBox checkBox = listItem.findViewById(R.id.absenceCheckbox);
 
 					// if participant was not absent
@@ -88,10 +88,45 @@ public class RatingActivity extends AppCompatActivity {
 						RatingBar ratingBar = listItem.findViewById(R.id.ratingBar);
 						int rating = Math.round(ratingBar.getRating());
 
-						//dataSnapshot
+						// gets total score and number of ratings of participant; calculates new values and assigns them
+						int totalScore = Integer.parseInt(dataSnapshot.child("users/" + userInformationList.get(i)[1] + "/totalScore").getValue(String.class)) + rating;
+						int noOfRatings = Integer.parseInt(dataSnapshot.child("users/" + userInformationList.get(i)[1] + "/numberOfRatings").getValue(String.class)) + 1;
+						// pushes new values in the database
+						reference.child("users/" + userInformationList.get(i)[1] + "/totalScore").setValue(String.valueOf(totalScore));
+						reference.child("users/" + userInformationList.get(i)[1] + "/numberOfRatings").setValue(String.valueOf(noOfRatings));
+						Log.d("mytag", "rated " + userInformationList.get(i)[1] + " " + rating + " for total of " + totalScore);
 					}
 				}
+
+				// removes meeting reference from the user database record
+				reference.child("users/" + mAuth.getCurrentUser().getUid() + "/meetings/" + meetingID).removeValue();
+				// sets the value of the current user key in the meeting details reference to false; used to signal which users gave feedback
+				reference.child("meetings/" + meetingID + "/members/" + mAuth.getCurrentUser().getUid()).setValue("false");
+
+				Log.d("mytag", "removed user");
+
+				// check if current user was the last one giving ratings
+				int participantsRated = 0; // assume no participants completed
+				for (DataSnapshot members : dataSnapshot.child("meetings/" + meetingID + "/members").getChildren())
+					// if any participant still did not end meeting and complete ratings
+					if (members.getValue(String.class).equals("true")) {
+						participantsRated++;
+						Log.d("mytag", members.getKey() + " " + participantsRated);
+					}
+
+				// if all participants (except the user right now) left ratings, delete meeting and chat
+				if (participantsRated <= 1) {
+					Log.d("mytag", "deletes meeting");
+					reference.child("meetings/" + meetingID).removeValue();
+					reference.child("chats/" + meetingID).removeValue();
+				}
+
+				goHome();
 			}
 		});
+	}
+
+	public void goHome () {
+		new Intentions(this).goHome();
 	}
 }

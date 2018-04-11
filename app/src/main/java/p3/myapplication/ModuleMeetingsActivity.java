@@ -28,11 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-@SuppressWarnings("ConstantConditions")
 public class ModuleMeetingsActivity extends AppCompatActivity {
-
-	FirebaseAuth mAuth;
-	FirebaseUser currentUser;
 	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	String module;
@@ -43,14 +39,12 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 	TextView message;
 
 	MeetingDetailsArrayAdapter adapter;
+	String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_module_meetings);
-
-		mAuth = FirebaseAuth.getInstance();
-		currentUser = mAuth.getCurrentUser();
 
 		BottomNavigationView navigation = findViewById(R.id.navigationModuleMeetings);
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -103,44 +97,50 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 
 		// iterates through all meetings
 		for (DataSnapshot data : dataSnapshot.child("meetings").getChildren()) {
-			// filters through all meetings and only selects the chosen module's meetings
-			if (data.child("module").getValue(String.class).equals(module)) {
+			// filters through all meetings and only selects:
+			// meetings that still exist
+			if (data.exists()) {
+				// the chosen module's meetings
+				if (data.child("module").getValue(String.class).equals(module)) {
 
-				// if meeting still exists
-				if (data.exists()) {
 					// checks if current user is a member of this meeting
 					Boolean isMember = false;
-					if (data.child("members/" + mAuth.getCurrentUser().getUid()).exists())
+					if (data.child("members/" + currentUid).exists())
 						isMember = true;
-					// gets the number of participants in the meeting
-					String noOfParticipants = String.valueOf(data.child("members").getChildrenCount());
-					// gets meeting end date
-					Date endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(data.child("endDate").getValue(String.class));
-					// gets current timestamp
-					Calendar calendar = Calendar.getInstance(Locale.UK);
-					calendar.add(Calendar.HOUR_OF_DAY, 1);
 
-					// check if the meeting has only the current user as sole participant and if the endTime has passed
-					if (Integer.parseInt(noOfParticipants) == 1 && endDate.before(calendar.getTime())) {
-						// remove meeting from database
-						if (!mAuth.getCurrentUser().getUid().isEmpty())
-							new Intentions(this).deleteMeeting(mAuth.getCurrentUser().getUid(), reference, dataSnapshot, data.getKey());
-					} else {
-						// sends all meeting details
-						String[] meetingDetails = {data.child("name").getValue(String.class), // name of meeting [0]
-								data.child("startDate").getValue(String.class), // start timestamp of meeting [1]
-								data.child("endDate").getValue(String.class), // end timestamp of meeting [2]
-								noOfParticipants, // number of members in the meeting [3]
-								data.getKey(), // key of meeting database reference [4]
-								module, // name of the meeting's module [5]
-								isMember.toString(), // if current user is a member [6]
-								mAuth.getCurrentUser().getUid(), // current user id [7]
-								dataSnapshot.child("users/" + mAuth.getCurrentUser().getUid() + "/firstName").getValue(String.class)}; // first name of current user [8]
-						list.add(meetingDetails);
+					// user cannot be ex member of the analysed meeting: only permits non-members or current members
+					if (!isMember || !data.child("members/" + currentUid).getValue(String.class).equals("false")) {
+
+						// gets the number of participants in the meeting
+						String noOfParticipants = String.valueOf(data.child("members").getChildrenCount());
+						// gets meeting end date
+						Date endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK).parse(data.child("endDate").getValue(String.class));
+						// gets current timestamp
+						Calendar calendar = Calendar.getInstance(Locale.UK);
+						calendar.add(Calendar.HOUR_OF_DAY, 1);
+
+						// check if the meeting has only the current user as sole participant and if the endTime has passed
+						if (Integer.parseInt(noOfParticipants) == 1 && endDate.before(calendar.getTime())) {
+							// remove meeting from database
+							if (!currentUid.isEmpty())
+								new Intentions(this).deleteMeeting(currentUid, reference, dataSnapshot, data.getKey());
+							// only if the user is not an ex member of the meeting, the meeting is displayed
+						} else {
+							// sends all meeting details
+							String[] meetingDetails = {data.child("name").getValue(String.class), // name of meeting [0]
+									data.child("startDate").getValue(String.class), // start timestamp of meeting [1]
+									data.child("endDate").getValue(String.class), // end timestamp of meeting [2]
+									noOfParticipants, // number of members in the meeting [3]
+									data.getKey(), // key of meeting database reference [4]
+									module, // name of the meeting's module [5]
+									isMember.toString(), // if current user is a member [6]
+									currentUid, // current user id [7]
+									dataSnapshot.child("users/" + currentUid + "/firstName").getValue(String.class)}; // first name of current user [8]
+							list.add(meetingDetails);
+						}
 					}
 				}
 			}
-
 		}
 
 		adapter = new MeetingDetailsArrayAdapter(0, this, list);

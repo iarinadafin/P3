@@ -249,4 +249,17 @@
 
     <string name="meeting_rating_title">Rate this meeting</string>
     <string name="absence_checkbox">Absent?</string>
+
+    <string name="my_profile_title">My profile</string>
+    <string name="logout">Logout</string>
+    <string name="your_details_label">Details</string>
+    <string name="full_name_label">Name</string>
+    <string name="course_display_label">Course</string>
+    <string name="year_display_label">Year of study </string>
+    <string name="full_name">%1$s %2$s</string>
+    <string name="your_rating_label">Rating</string>
+    <string name="rating_description">Positive interactions will give you good ratings. Keep them high to gain a good reputation!</string>
+    <string name="your_score_label">Score</string>
+    <string name="points_left_label">%s points to the next level</string>
+    <string name="level_label">Level %1$d - %1$s points</string>
 </resources>
