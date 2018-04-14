@@ -13,7 +13,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,10 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ModuleMeetingsActivity extends AppCompatActivity {
-	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+import p3.myapplication.ArrayAdapters.MeetingDetailsArrayAdapter;
 
-	String module;
+@SuppressWarnings("ConstantConditions")
+public class ModuleMeetingsActivity extends AppCompatActivity {
+
+	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	TextView moduleMeetingsTitle;
 	ListView moduleMeetingsList;
@@ -40,17 +41,34 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 
 	MeetingDetailsArrayAdapter adapter;
 	String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+	String module;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_module_meetings);
 
-		BottomNavigationView navigation = findViewById(R.id.navigationModuleMeetings);
+		// set navbar behaviour
+		BottomNavigationView navigation = findViewById(R.id.navigationChatsList);
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-				return new Intentions(ModuleMeetingsActivity.this).chooseMenuItem(item);
+				Helper helper = new Helper(ModuleMeetingsActivity.this);
+				switch (item.getItemId()) {
+					case R.id.action_home: {
+						helper.goHome();
+						return false;
+					}
+					case R.id.action_messages: {
+						helper.goToMessages();
+						return false;
+					}
+					case R.id.action_profile: {
+						helper.goToProfile();
+						return false;
+					}
+				}
+				return false;
 			}
 		});
 		navigation.getMenu().findItem(navigation.getSelectedItemId()).setCheckable(false);
@@ -74,7 +92,6 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 	}
 
 	public void showModuleMeetings () {
-
 		reference.addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
@@ -123,7 +140,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 						if (Integer.parseInt(noOfParticipants) == 1 && endDate.before(calendar.getTime())) {
 							// remove meeting from database
 							if (!currentUid.isEmpty())
-								new Intentions(this).deleteMeeting(currentUid, reference, dataSnapshot, data.getKey());
+								new Helper(this).deleteMeeting(currentUid, reference, data.getKey());
 							// only if the user is not an ex member of the meeting, the meeting is displayed
 						} else {
 							// sends all meeting details
@@ -173,6 +190,9 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 			message.setVisibility(View.VISIBLE);
 	}
 
+	/**
+	 * Starts the create a new meeting activity and passes the module name to it
+	 */
 	void goToCreateNewMeeting () {
 		Intent i = new Intent(this, CreateMeetingActivity.class);
 		i.putExtra("p3.myapplication:module_name_list", module);

@@ -27,6 +27,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import p3.myapplication.Model.Meeting;
+import p3.myapplication.Model.Message;
+
 public class CreateMeetingActivity extends AppCompatActivity {
 
 	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
@@ -54,7 +57,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 	int selectedEndMinute = 0;
 	String moduleName;
 	String pushKey = reference.child("meetings/" + moduleName).push().getKey();
-	Intentions intentions = new Intentions(this);
+	Helper helper = new Helper(this);
 
 	@SuppressWarnings("ConstantConditions")
 	@Override
@@ -149,9 +152,11 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		submit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				// prepares the start and end dates from the date and time pickers, in the right format for the database
 				String startDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + checkExtraZero(selectedDay) + " " + startTimeLabel.getText();
 				String endDate = selectedYear + "-" + checkExtraZero(selectedMonth + 1) + "-" + checkExtraZero(selectedDay) + " " + endTimeLabel.getText();
 
+				// if verification passes
 				if (verifyData(startDate, endDate, startTimeLabel.getText().toString(), endTimeLabel.getText().toString())) {
 					// sets all meeting information
 					reference.child("meetings/" + pushKey).setValue(new Meeting(meetingName.getText().toString(), startDate, endDate, moduleName));
@@ -168,8 +173,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 																							"system",
 																							dataSnapshot.child("users/" + mAuth.getCurrentUser().getUid() + "/firstName").getValue(String.class) + " joined"));
 							// increases user points
-							int score = Integer.parseInt(dataSnapshot.child("users/" + mAuth.getCurrentUser().getUid() + "/score").getValue(String.class));
-							reference.child("users/" + mAuth.getCurrentUser().getUid() + "/score").setValue(String.valueOf(score + 10));
+							helper.addPoints(dataSnapshot, reference, mAuth.getCurrentUser().getUid(), 10);
 						}
 
 						@Override
@@ -179,7 +183,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 					});
 
 					// goes to view meeting after creation
-					intentions.goToViewMeeting(pushKey,
+					helper.goToViewMeeting(pushKey,
 												moduleName,
 												getFriendlyDate(selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay),
 												startTimeLabel.getText().toString() + " - " + endTimeLabel.getText().toString());
@@ -191,13 +195,24 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		});
 	}
 
-	// helps set the date label to the date selected with the date picker
+	/**
+	 * Helps set the date label to the date selected with the date picker
+	 * @param year the year value
+	 * @param month the month value
+	 * @param dayOfMonth the day of month value
+	 */
 	public void setDateLabel (int year, int month, int dayOfMonth) {
 		String dateString = String.format(getResources().getString(R.string.date_format_create),
 				new DateFormatSymbols().getMonths()[month], dayOfMonth, year);
 		dateLabel.setText(dateString);
 	}
 
+	/**
+	 * Helps set the time labels to the times selected with the time pickers
+	 * @param field the time label that will be set; either start time or end time
+	 * @param hour the hour value
+	 * @param minute the minute value
+	 */
 	public void setTimeLabel (TextView field, int hour, int minute) {
 		String hourString = checkExtraZero(hour);
 		String minuteString = checkExtraZero(minute);
@@ -206,12 +221,22 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		field.setText(timeString);
 	}
 
+	/**
+	 * Checks the date or time values, so that any single digit will be suffixed to a zero. Helps set a universal format for the timestamp.
+	 * @param number the number that will be checked
+	 * @return a string representing the value, prefixed or not
+	 */
 	String checkExtraZero (int number) {
 		if (number < 10)
 			return "0" + Integer.toString(number);
 		return Integer.toString(number);
 	}
 
+	/**
+	 * Gets a date string and transforms it into a friendly format
+	 * @param dateString the string that should be transformed; has format: yyyy-MM-dd
+	 * @return a string with the friendly date format EEE, MMM dd, yyyy
+	 */
 	String getFriendlyDate (String dateString) {
 		Date dateObject = new Date();
 		try {
@@ -227,8 +252,16 @@ public class CreateMeetingActivity extends AppCompatActivity {
 				new SimpleDateFormat("yyyy", Locale.UK).format(dateObject)); // year
 	}
 
+	/**
+	 * Verifies the validity of the create meeting fields
+	 * @param startDate the start date of the meeting
+	 * @param endDate the end date of the meeting
+	 * @param startTime the start time of the meeting
+	 * @param endTime the end time of the meeting
+	 * @return either true if the info is correct, false otherwise
+	 */
 	boolean verifyData (String startDate, String endDate, String startTime, String endTime) {
-		boolean check = true;
+		boolean check = true; // initially assumes all info is correct
 		try {
 			Date startTimeDate = new SimpleDateFormat("HH:mm", Locale.UK).parse(startTime);
 			Date endTimeDate = new SimpleDateFormat("HH:mm", Locale.UK).parse(endTime);

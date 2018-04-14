@@ -1,4 +1,4 @@
-package p3.myapplication;
+package p3.myapplication.ArrayAdapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,17 +11,18 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import p3.myapplication.R;
 
 public class ChatMessageArrayAdapter extends ArrayAdapter<String[]> {
 
 	private Context context;
+
 	private List<String[]> values = new ArrayList<>();
 
-	ChatMessageArrayAdapter(int resource, Context context, List<String[]> values) {
+	public ChatMessageArrayAdapter(int resource, Context context, List<String[]> values) {
 		super(context, resource, values);
 		this.context = context;
 		this.values = values;

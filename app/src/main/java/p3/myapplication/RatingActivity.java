@@ -1,9 +1,7 @@
 package p3.myapplication;
 
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,11 +16,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import p3.myapplication.ArrayAdapters.RatingArrayAdapter;
+
+@SuppressWarnings("ConstantConditions")
 public class RatingActivity extends AppCompatActivity {
 
 	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
@@ -35,6 +34,7 @@ public class RatingActivity extends AppCompatActivity {
 	RatingArrayAdapter adapter;
 	List<String[]> userInformationList = new ArrayList<>();
 	String meetingID;
+	Helper helper = new Helper(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +94,6 @@ public class RatingActivity extends AppCompatActivity {
 						// pushes new values in the database
 						reference.child("users/" + userInformationList.get(i)[1] + "/totalScore").setValue(String.valueOf(totalScore));
 						reference.child("users/" + userInformationList.get(i)[1] + "/numberOfRatings").setValue(String.valueOf(noOfRatings));
-						Log.d("mytag", "rated " + userInformationList.get(i)[1] + " " + rating + " for total of " + totalScore);
 					}
 				}
 
@@ -103,30 +102,24 @@ public class RatingActivity extends AppCompatActivity {
 				// sets the value of the current user key in the meeting details reference to false; used to signal which users gave feedback
 				reference.child("meetings/" + meetingID + "/members/" + mAuth.getCurrentUser().getUid()).setValue("false");
 
-				Log.d("mytag", "removed user");
-
 				// check if current user was the last one giving ratings
 				int participantsRated = 0; // assume no participants completed
 				for (DataSnapshot members : dataSnapshot.child("meetings/" + meetingID + "/members").getChildren())
 					// if any participant still did not end meeting and complete ratings
-					if (members.getValue(String.class).equals("true")) {
+					if (members.getValue(String.class).equals("true"))
 						participantsRated++;
-						Log.d("mytag", members.getKey() + " " + participantsRated);
-					}
 
 				// if all participants (except the user right now) left ratings, delete meeting and chat
 				if (participantsRated <= 1) {
-					Log.d("mytag", "deletes meeting");
 					reference.child("meetings/" + meetingID).removeValue();
 					reference.child("chats/" + meetingID).removeValue();
 				}
 
-				goHome();
+				// subtract 10 points if meeting is left
+				helper.addPoints(dataSnapshot, reference, FirebaseAuth.getInstance().getCurrentUser().getUid(), 10);
+
+				helper.goHome();
 			}
 		});
-	}
-
-	public void goHome () {
-		new Intentions(this).goHome();
 	}
 }

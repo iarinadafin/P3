@@ -6,7 +6,6 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,23 +25,19 @@ import java.util.List;
 
 public class ModuleListActivity extends AppCompatActivity {
 
-	FirebaseAuth mAuth;
-	FirebaseUser currentUser;
-	DatabaseReference reference;
+	FirebaseAuth mAuth = FirebaseAuth.getInstance();
+	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	ListView modulesList;
 
 	ArrayAdapter<String> itemsAdapter;
 	String[] moduleArray;
 
+	@SuppressWarnings("ConstantConditions")
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_module_list);
-
-		mAuth = FirebaseAuth.getInstance();
-		currentUser = mAuth.getCurrentUser();
-		reference = FirebaseDatabase.getInstance().getReference();
 
 		modulesList = findViewById(R.id.moduleListCreate);
 
@@ -50,19 +45,19 @@ public class ModuleListActivity extends AppCompatActivity {
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-				Intentions intentions = new Intentions(ModuleListActivity.this);
+				Helper helper = new Helper(ModuleListActivity.this);
 				switch (item.getItemId()) {
 					case R.id.action_home: {
-						intentions.goHome();
+						helper.goHome();
 						return false;
 					}
 					case R.id.action_messages: {
-						intentions.goToMessages();
+						helper.goToMessages();
 						return false;
 					}
 					case R.id.action_profile: {
 						mAuth.signOut();
-						intentions.goToSignIn();
+						helper.goToSignIn();
 						return false;
 					}
 				}
@@ -71,7 +66,8 @@ public class ModuleListActivity extends AppCompatActivity {
 		});
 		navigation.getMenu().findItem(navigation.getSelectedItemId()).setCheckable(false);
 
-		reference.child("users/" + currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+		// gets the current user, their course and year of study
+		reference.child("users/" + mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				Pair<String, String> userCourseData = getUserCourse(dataSnapshot);
@@ -86,6 +82,7 @@ public class ModuleListActivity extends AppCompatActivity {
 			public void onCancelled(DatabaseError databaseError) {}
 		});
 
+		// the onclick listener for each ListView item (module)
 		modulesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -104,10 +101,20 @@ public class ModuleListActivity extends AppCompatActivity {
 		super.onStop();
 	}
 
+	/**
+	 * Gets the user's course and year of study
+	 * @param dataSnapshot the DataSnapshot used to retrieve the data
+	 * @return a pair containing a string of the course name and a string of the year of study
+	 */
 	public Pair<String, String> getUserCourse (DataSnapshot dataSnapshot) {
 		return new Pair<> (dataSnapshot.child("course").getValue(String.class), dataSnapshot.child("year").getValue(String.class));
 	}
 
+	/**
+	 * Customises the module list according to the user's course and year of study
+	 * @param course the current user's course
+	 * @param year the current user's year of study
+	 */
 	public void customiseModules (String course, int year) {
 		switch (course) {
 			case "Computer Science": {
@@ -145,7 +152,13 @@ public class ModuleListActivity extends AppCompatActivity {
 			}
 		}
 	}
-	
+
+	/**
+	 * Sets the list of the adapter that will populate the ListView of the modules
+	 * Also checks for special modules in certain courses
+	 * @param resource the appropriate string array resource that contains the course's modules for the user's year of study
+	 * @param compSciY2 signals if special course needs to be added
+	 */
 	public void setModuleValues (int resource, boolean compSciY2) {
 		// adds an extra module for comp sci yr 2
 		if (compSciY2) {
@@ -160,6 +173,10 @@ public class ModuleListActivity extends AppCompatActivity {
 		modulesList.setAdapter(itemsAdapter);
 	}
 
+	/**
+	 * Starts the module meetings list activity
+	 * @param module string of the module chosen, passed over to the activity
+	 */
 	public void goToModuleMeetingsList (String module) {
 		Intent i = new Intent(this, ModuleMeetingsActivity.class);
 		i.putExtra("p3.myapplication:module", module);

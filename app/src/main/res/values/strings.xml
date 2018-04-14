@@ -1,12 +1,15 @@
 <resources>
+    <!-- Application strings -->
     <string name="app_name">My Application</string>
     <string name="empty_string"> </string>
 
-    <string name="auth_failed">Auth failed!</string>
+    <!-- Sign in activity -->
+    <string name="auth_failed">Authentication failed!</string>
     <string name="login_button">Login</string>
     <string name="email_login">abc1d23@soton.ac.uk</string>
     <string name="password_login">••••••••</string>
 
+    <!-- Sign up activity -->
     <string name="signup_button">Sign Up</string>
     <string name="first_name_label">First name</string>
     <string name="first_name">Anne</string>
@@ -27,11 +30,13 @@
     <string name="year_value_3">3</string>
     <string name="year_value_4">4</string>
 
+    <!-- Home page activity -->
     <string name="welcome_message">Welcome back, %s!</string>
     <string name="create_meeting_button">Set up a meeting</string>
     <string name="your_meetings_label">Your meetings:</string>
     <string name="no_meetings_home_label">You have not joined any meetings.</string>
 
+    <!-- Module list activity -->
     <string name="choose_module_label">Choose a module:</string>
     <!-- electro eng -->
     <string-array name="ee_courses_year_1">
@@ -204,6 +209,7 @@
         <item>Foundations of Web Science</item>
     </string-array>
 
+    <!-- Module meetings activity -->
     <string name="module_meetings_label">%s Meetings</string>
     <string name="create_a_new_meeting">Create a new meeting</string>
     <string name="no_meetings_label">There are no meetings for this module.</string>
@@ -218,10 +224,12 @@
         <item quantity="other">%s participants joined</item>
     </plurals>
 
+    <!-- Bottom navbar fragment -->
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- View meeting activity -->
     <string name="edit_meeting">Edit</string>
     <string name="leave_meeting">Leave meeting</string>
     <string name="end_meeting">End meeting</string>
@@ -230,6 +238,7 @@
     <string name="date_label">Date</string>
     <string name="time_label">Time</string>
 
+    <!-- Create meeting activity -->
     <string name="meeting_name_label">Meeting name</string>
     <string name="meeting_name">Exam Preparation</string>
     <string name="start_time_label">Start time</string>
@@ -241,15 +250,21 @@
     <string name="time_format_create">%1$s:%2$s</string>
     <string name="confirm_meeting_create">Submit</string>
 
+    <!-- Chats list activity -->
     <string name="chats_list_title">Your messages:</string>
     <string name="last_message_sender">%s:\u0020</string>
 
+    <!-- Chat activity -->
+    <string name="view_meeting">View meeting</string>
     <string name="user_joined_or_left_message">%s the chat</string>
     <string name="message_typing_hint">Type a message&#8230;</string>
 
+    <!-- Rating activity -->
     <string name="meeting_rating_title">Rate this meeting</string>
     <string name="absence_checkbox">Absent?</string>
+    <string name="receive_points">You will receive 10 points!</string>
 
+    <!-- User profile activity -->
     <string name="my_profile_title">My profile</string>
     <string name="logout">Logout</string>
     <string name="your_details_label">Details</string>
@@ -260,6 +275,6 @@
     <string name="your_rating_label">Rating</string>
     <string name="rating_description">Positive interactions will give you good ratings. Keep them high to gain a good reputation!</string>
     <string name="your_score_label">Score</string>
-    <string name="points_left_label">%s points to the next level</string>
-    <string name="level_label">Level %1$d - %1$s points</string>
+    <string name="points_left_label">%d points to the next level</string>
+    <string name="level_label">Level %1$d - %2$d points</string>
 </resources>

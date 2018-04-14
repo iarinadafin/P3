@@ -1,7 +1,6 @@
 package p3.myapplication;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -18,20 +17,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import p3.myapplication.Model.User;
 
 public class SignUpActivity extends Activity {
 
 	private FirebaseAuth mAuth;
-	private FirebaseUser currentUser;
-
-	FirebaseDatabase database;
 	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-	DatabaseReference cond = reference.child("users");
-
-	User user;
 
 	EditText firstNameField;
 	EditText lastNameField;
@@ -41,8 +35,10 @@ public class SignUpActivity extends Activity {
 	EditText passwordField;
 	EditText confirmPasswordField;
 	Button signUpButton;
-
 	ProgressBar progressBar;
+
+	User user;
+	Helper helper = new Helper(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +46,6 @@ public class SignUpActivity extends Activity {
 		setContentView(R.layout.activity_sign_up);
 
 		mAuth = FirebaseAuth.getInstance();
-		database = FirebaseDatabase.getInstance();
-		reference = database.getReference();
 
 		firstNameField = findViewById(R.id.firstNameSignUp);
 		lastNameField = findViewById(R.id.lastNameSignUp);
@@ -72,7 +66,6 @@ public class SignUpActivity extends Activity {
 				if (validateForm(passwordField.getText().toString(), confirmPasswordField.getText().toString())) {
 					progressBar.setVisibility(View.VISIBLE);
 
-					//int yearValue = Integer.parseInt(((RadioButton) findViewById(yearRadioGroup.getCheckedRadioButtonId())).getText().toString());
 					user = new User(firstNameField.getText().toString(), lastNameField.getText().toString(), courseSpinner.getSelectedItem().toString(), ((RadioButton) findViewById(yearRadioGroup.getCheckedRadioButtonId())).getText().toString(), emailField.getText().toString());
 
 					signUp(passwordField.getText().toString());
@@ -120,10 +113,9 @@ public class SignUpActivity extends Activity {
 					// Sign in success, update UI with the signed-in user's information
 					Log.d("mytag", "createUserWithEmail:success");
 
-					currentUser = mAuth.getCurrentUser();
 					pushToDatabase(user);
 
-					goToLogin();
+					helper.goToSignIn();
 				} else {
 					// If sign in fails, display a message to the user.
 					Log.w("mytag", "createUserWithEmail:failure", task.getException());
@@ -139,40 +131,46 @@ public class SignUpActivity extends Activity {
 		super.onStop();
 	}
 
+	/**
+	 * Pushes the created user object to the database
+	 * @param user the object created with the user information
+	 */
 	public void pushToDatabase (User user) {
-		currentUser = mAuth.getCurrentUser();
-
-		if (currentUser != null)
-			cond.child(currentUser.getUid()).setValue(user);
+		if (mAuth.getCurrentUser() != null)
+			reference.child("users/" + mAuth.getCurrentUser().getUid()).setValue(user);
 	}
 
+	/**
+	 * Validates the sign up information fields
+	 * @param password the password passed to the form
+	 * @param confirmPassword the confirmation password passed to the form
+	 * @return a boolean: true if all information is correct, false otherwise
+	 */
 	public boolean validateForm (String password, String confirmPassword) {
 		// assumes everything is right
 		boolean check = true;
 
 		// checks if any fields are empty
-
 		if (firstNameField.getText().toString().equals("")) {
 			focusChange(firstNameField, false);
 			check = false;
 		}
-
 		if (lastNameField.getText().toString().equals("")) {
 			focusChange(lastNameField, false);
 			check = false;
 		}
 
-		// also checks for email match by comparing to regex
+		// also checks for email format match by comparing to regex
 		if (emailField.getText().toString().equals("") || !emailField.getText().toString().matches("(?i:^[a-z][a-z]([a-z]?)[0-9][a-z][0-9][0-9](@soton.ac.uk)$)")) {
 			focusChange(emailField, false);
 			check = false;
 		}
 
+		// checks for empty password fields
 		if (passwordField.getText().toString().equals("")) {
 			focusChange(passwordField, false);
 			check = false;
 		}
-
 		if (confirmPasswordField.getText().toString().equals("")) {
 			focusChange(confirmPasswordField, false);
 			check = false;
@@ -186,10 +184,5 @@ public class SignUpActivity extends Activity {
 		}
 
 		return check;
-	}
-
-	public void goToLogin () {
-		Intent i = new Intent(this, MainActivity.class);
-		startActivity(i);
 	}
 }

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,6 +28,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import p3.myapplication.ArrayAdapters.ParticipantDetailsArrayAdapter;
+import p3.myapplication.Model.Message;
+
 @SuppressWarnings("ConstantConditions")
 public class ViewMeetingActivity extends AppCompatActivity {
 
@@ -45,10 +47,9 @@ public class ViewMeetingActivity extends AppCompatActivity {
 	Button endMeeting;
 	LinearLayout manageMeetingPanel;
 
-	String participantName;
 	String referenceString;
 	String meetingID;
-	Intentions helper;
+	Helper helper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,7 @@ public class ViewMeetingActivity extends AppCompatActivity {
 
 		meetingID = getIntent().getExtras().getString("p3.myapplication:meeting_id");
 		referenceString = "meetings/" + meetingID;
-		helper = new Intentions(ViewMeetingActivity.this);
+		helper = new Helper(ViewMeetingActivity.this);
 
 		titleLabel = findViewById(R.id.meetingTitleView);
 		moduleLabel = findViewById(R.id.meetingModuleView);
@@ -121,11 +122,11 @@ public class ViewMeetingActivity extends AppCompatActivity {
 		time.setText(getIntent().getExtras().getString("p3.myapplication:hours"));
 
 		// gets all the participants in /[meeting]/members and looks for the matching key information in /users
-		List<String> values = new ArrayList<>();
+		List<String[]> values = new ArrayList<>();
 		for (DataSnapshot data : dataSnapshot.child(referenceString + "/members").getChildren()) {
 			DataSnapshot user = dataSnapshot.child("users/" + data.getKey());
-			participantName = user.child("firstName").getValue(String.class) + " " + user.child("lastName").getValue(String.class);
-			values.add(participantName);
+			String rating = String.format(java.util.Locale.US,"%.1f", helper.getRating(dataSnapshot));
+			values.add(new String[] {user.child("firstName").getValue(String.class), user.child("lastName").getValue(String.class), rating});
 		}
 
 		// if meeting still exists
@@ -158,7 +159,7 @@ public class ViewMeetingActivity extends AppCompatActivity {
 				// if meeting has one participant, and the endTime has passed
 				// the meeting will be cancelled automatically
 				else if (dataSnapshot.child("meetings/" + meetingID + "/members").getChildrenCount() == 1 && meetingEndDate.before(calendar.getTime())) {
-					helper.deleteMeeting(meetingID, reference, dataSnapshot, meetingID);
+					helper.deleteMeeting(meetingID, reference, meetingID);
 					// redirects the user to the home page
 					helper.goHome();
 				}
@@ -179,10 +180,9 @@ public class ViewMeetingActivity extends AppCompatActivity {
 									// todo: POTENTIAL BUG ?????
 									// if current user is the only participant
 									if (dataSnapshot.child("meetings/" + meetingID + "/members").getChildrenCount() <= 1) {
-										helper.deleteMeeting(FirebaseAuth.getInstance().getCurrentUser().getUid(), reference, dataSnapshot, meetingID);
+										helper.deleteMeeting(FirebaseAuth.getInstance().getCurrentUser().getUid(), reference, meetingID);
 										// subtract 10 points if meeting is left
-										reference.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/score")
-												.setValue(Integer.parseInt(dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/score").getValue(String.class)) - 10);
+										helper.addPoints(dataSnapshot, reference, FirebaseAuth.getInstance().getCurrentUser().getUid(), -10);
 										// redirects the user to the home page
 										helper.goHome();
 									}
@@ -224,6 +224,9 @@ public class ViewMeetingActivity extends AppCompatActivity {
 								"system",
 								dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/firstName").getValue(String.class) + " joined"));
 
+						// add 10 points if meeting is joined
+						helper.addPoints(dataSnapshot, reference, FirebaseAuth.getInstance().getCurrentUser().getUid(), 10);
+
 						manageMeetingPanel.setVisibility(View.VISIBLE);
 						leaveMeeting.setVisibility(View.VISIBLE);
 						joinMeeting.setVisibility(View.GONE);
@@ -232,8 +235,7 @@ public class ViewMeetingActivity extends AppCompatActivity {
 			}
 		}
 
-
-		ArrayAdapter<String> participantListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, values);
+		ParticipantDetailsArrayAdapter participantListAdapter = new ParticipantDetailsArrayAdapter(0, this, values);
 		participantsList.setAdapter(participantListAdapter);
 	}
 

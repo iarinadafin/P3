@@ -1,10 +1,9 @@
-package p3.myapplication;
+package p3.myapplication.ArrayAdapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,17 +22,20 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import p3.myapplication.ChatActivity;
+import p3.myapplication.R;
+
 public class MeetingChatArrayAdapter extends ArrayAdapter<String[]> {
 
 	private DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	private Context context;
-	private List<String[]> values = new ArrayList<>();
-
 	private TextView lastMessage;
 	private TextView lastMessageSender;
 
-	MeetingChatArrayAdapter(int resource, Context context, List<String[]> values) {
+	private List<String[]> values = new ArrayList<>();
+
+	public MeetingChatArrayAdapter(int resource, Context context, List<String[]> values) {
 		super(context, resource, values);
 		this.context = context;
 		this.values = values;
@@ -101,6 +103,7 @@ public class MeetingChatArrayAdapter extends ArrayAdapter<String[]> {
 			}
 		});
 
+		// sets listener for individual chat room in chats list
 		item.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

@@ -1,11 +1,11 @@
-package p3.myapplication;
+package p3.myapplication.Model;
 
 /**
  * Created by Iarina Dafin.
  */
 
 @SuppressWarnings("unused") // used for mandatory empty constructor and getters/setters
-class User {
+public class User {
 
 	private String firstName;
 	private String lastName;
@@ -19,7 +19,15 @@ class User {
 
 	public User () {}
 
-	User (String firstName, String lastName, String course, String year, String email) {
+	/**
+	 * The constructor for the user class.
+	 * @param firstName the first name of the user
+	 * @param lastName the last mane of the user
+	 * @param course the course that the user is enrolled in
+	 * @param year the year of study that the user is in
+	 * @param email the university email of the user
+	 */
+	public User (String firstName, String lastName, String course, String year, String email) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.course = course;
@@ -46,7 +54,7 @@ class User {
 		this.lastName = lastName;
 	}
 
-	String getEmail() {
+	public String getEmail() {
 		return email;
 	}
 

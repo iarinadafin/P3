@@ -25,7 +25,6 @@
             android:id="@+id/chatTitleLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:fillViewport="true"
             android:fontFamily="sans-serif-condensed"
             android:textAlignment="center"
@@ -34,6 +33,17 @@
             android:textStyle="bold"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="16dp"/>
+
+        <Button
+            android:id="@+id/viewMeetingChat"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="@string/view_meeting"
+            android:textSize="18sp"/>
 
         <ListView
             android:id="@+id/chatMessages"

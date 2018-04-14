@@ -1,4 +1,4 @@
-package p3.myapplication;
+package p3.myapplication.Model;
 
 @SuppressWarnings("unused")
 public class Meeting {
@@ -8,7 +8,14 @@ public class Meeting {
 	private String endDate;
 	private String module;
 
-	Meeting (String name, String startDate, String endDate, String module) {
+	/**
+	 * Constructor for the meeting object.
+	 * @param name the name of the meeting
+	 * @param startDate start date and time string of the meeting; format: yyyy-MM-dd HH:mm
+	 * @param endDate end date and time of the meeting; format: yyyy-MM-dd HH:mm
+	 * @param module the module that this meeting has been listed for
+	 */
+	public Meeting (String name, String startDate, String endDate, String module) {
 		this.name = name;
 		this.startDate = startDate;
 		this.endDate = endDate;

@@ -1,7 +1,6 @@
 package p3.myapplication;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,9 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
  * Created by Iarina Dafin.
  */
 
-public class MainActivity extends Activity {
+public class SignInActivity extends Activity {
 
-	private FirebaseAuth mAuth;
+	private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 	private FirebaseAuth.AuthStateListener mAuthListener;
 
 	// components in the view
@@ -31,13 +30,14 @@ public class MainActivity extends Activity {
 	protected Button loginButton;
 	protected Button signUpButton;
 
-	Intent goToSignUp; // todo: change this into a method
+	Helper helper = new Helper(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// used if a persistent database is used
 		/*
 		try {
 			FirebaseDatabase.getInstance().setPersistenceEnabled(true);
@@ -45,10 +45,6 @@ public class MainActivity extends Activity {
 			Log.e("mytag", "FirbaseDatabase setPersistanceEnabled exception");
 		}
 		*/
-		// todo: re-enable and keepsynced(true)
-
-		mAuth = FirebaseAuth.getInstance();
-		goToSignUp = new Intent(this, SignUpActivity.class);
 
 		emailLoginField = findViewById(R.id.emailLogin);
 		passwordLoginField = findViewById(R.id.passwordLogin);
@@ -61,11 +57,10 @@ public class MainActivity extends Activity {
 				signIn();
 			}
 		});
-
 		signUpButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				startActivity(goToSignUp);
+				helper.goToSignUp();
 			}
 		});
 
@@ -77,7 +72,7 @@ public class MainActivity extends Activity {
 				if (user != null) {
 					// User is signed in
 					Log.d("mytag", "onAuthStateChanged:signed_in:" + user.getUid());
-					goHome();
+					helper.goHome();
 				} else {
 					// User is signed out
 					Log.d("mytag", "onAuthStateChanged:signed_out");
@@ -112,19 +107,26 @@ public class MainActivity extends Activity {
 					if (task.isSuccessful()) {
 						// if sign in success, update UI
 						Log.d("mytag", "signInWithEmail:success");
-						goHome();
+						helper.goHome();
 					} else {
 						// if sign in fails, display a message
 						Log.w("mytag", "signInWithEmail:failure", task.getException());
-						Toast.makeText(MainActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(SignInActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
 					}
 				}
 			});
 
 	}
 
+	/**
+	 * Used to verify that the login fields are correctly filled in
+	 * @param email the user's email address
+	 * @param password the user's password
+	 * @return a boolean: true if all information is correct, false otherwise
+	 */
 	public boolean verifyFields (String email, String password) {
-		Boolean check = true;
+		Boolean check = true; // initially assumes all information is correct
+
 		if (email.equals("")) {
 			emailLoginField.setError("Required!");
 			check = false;
@@ -135,10 +137,5 @@ public class MainActivity extends Activity {
 		}
 
 		return check;
-	}
-
-	public void goHome () {
-		Intent i = new Intent(this, HomeActivity.class);
-		startActivity(i);
 	}
 }

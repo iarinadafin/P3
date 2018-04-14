@@ -1,7 +1,6 @@
 package p3.myapplication;
 
 import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +26,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import p3.myapplication.ArrayAdapters.MeetingDetailsArrayAdapter;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -43,27 +43,27 @@ public class HomeActivity extends AppCompatActivity {
 	List<String[]> userMeetingsList = new ArrayList<>();
 	String currentUid;
 
+	@SuppressWarnings("ConstantConditions")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 
 		mAuth = FirebaseAuth.getInstance();
-		currentUid = mAuth.getCurrentUser().getUid();
 		reference = FirebaseDatabase.getInstance().getReference();
 
 		BottomNavigationView navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-				Intentions intentions = new Intentions(HomeActivity.this);
+				Helper helper = new Helper(HomeActivity.this);
 				switch (item.getItemId()) {
 					case R.id.action_messages: {
-						intentions.goToMessages();
+						helper.goToMessages();
 						return false;
 					}
 					case R.id.action_profile: {
-						intentions.goToProfile();
+						helper.goToProfile();
 						return false;
 					}
 				}
@@ -81,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
 		createMeeting.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				goToCreateMeeting();
+				goToChooseMeeting();
 			}
 		});
 
@@ -113,7 +113,6 @@ public class HomeActivity extends AppCompatActivity {
 	}
 
 	public void showTitle () {
-
 		reference.child("users").child(currentUid).addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
@@ -127,13 +126,22 @@ public class HomeActivity extends AppCompatActivity {
 		});
 	}
 
-	@SuppressWarnings("ConstantConditions")
+	/**
+	 * Sets the name in the welcome message on the home screen
+	 * @param dataSnapshot the DataSnapshot used to extract the name of the current user
+	 */
 	public void showData (DataSnapshot dataSnapshot) {
 		String message = String.format(getResources().getString(R.string.welcome_message), dataSnapshot.child("firstName").getValue(String.class));
 		welcomeMessage.setText(message);
 	}
 
+	/**
+	 * Displays the user's meetings that they are participants of
+	 * @param dataSnapshot the DataSnapshot used to retrieve all meeting information
+	 * @throws ParseException thrown as a consequence of parsing date object
+	 */
 	public void showUserMeetings (DataSnapshot dataSnapshot) throws ParseException {
+		// clears the adapter array so the ListView can refresh
 		userMeetingsList.clear();
 
 		// if user joined any meetings
@@ -152,7 +160,7 @@ public class HomeActivity extends AppCompatActivity {
 					if (dataSnapshot.child("meetings/" + userMeeting.getKey() + "/members").getChildrenCount() == 1 && endDate.before(calendar.getTime())) {
 						// remove meeting from database
 						if (mAuth.getCurrentUser() != null)
-							new Intentions(this).deleteMeeting(mAuth.getCurrentUser().getUid(), reference, dataSnapshot, userMeeting.getKey());
+							new Helper(this).deleteMeeting(mAuth.getCurrentUser().getUid(), reference, userMeeting.getKey());
 					} else {
 						// sends all meeting details to the listview
 						String[] meetingDetails = {dataSnapshot.child("meetings/" + userMeeting.getKey() + "/name").getValue(String.class), // name of meeting [0]
@@ -171,7 +179,8 @@ public class HomeActivity extends AppCompatActivity {
 			// adds all meetings to the adapter and then into the listview
 			adapter = new MeetingDetailsArrayAdapter(0, this, userMeetingsList);
 			userMeetings.setAdapter(adapter);
-			// if listview is empty, show appropriate message
+
+			// if ListView is empty, show appropriate message
 			if (userMeetingsList.size() == 0)
 				message.setVisibility(View.VISIBLE);
 			else
@@ -179,7 +188,10 @@ public class HomeActivity extends AppCompatActivity {
 		}
 	}
 
-	public void goToCreateMeeting () {
+	/**
+	 * Starts the activity that shows the user the meetings under a certain module
+	 */
+	public void goToChooseMeeting () {
 		Intent i = new Intent(this, ModuleListActivity.class);
 		startActivity(i);
 	}

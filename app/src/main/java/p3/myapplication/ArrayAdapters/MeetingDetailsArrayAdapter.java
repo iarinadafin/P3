@@ -1,9 +1,8 @@
-package p3.myapplication;
+package p3.myapplication.ArrayAdapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -23,15 +21,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import p3.myapplication.Helper;
+import p3.myapplication.Model.Message;
+import p3.myapplication.R;
+
 public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 
 	private DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	private Context context;
-	private List<String[]> values = new ArrayList<>();
-	private Intentions helper;
 
-	MeetingDetailsArrayAdapter(int resource, Context context, List<String[]> values) {
+	private List<String[]> values = new ArrayList<>();
+	private Helper helper;
+
+	public MeetingDetailsArrayAdapter(int resource, Context context, List<String[]> values) {
 		super(context, resource , values);
 		this.context = context;
 		this.values = values;
@@ -46,7 +49,8 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 		// handles null list of values
 		listItem = LayoutInflater.from(context).inflate(R.layout.meeting_details_row_item, parent, false);
 
-		helper = new Intentions(context);
+		// helper class
+		helper = new Helper(context);
 
 		// import all fields that need to be populated in a card
 		TextView title = listItem.findViewById(R.id.titleLabel);
@@ -124,7 +128,7 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 				joinOrMessageButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						new Intentions(context).goToChat(values.get(position)[4], values.get(position)[0]);
+						new Helper(context).goToChat(values.get(position)[4], values.get(position)[0]);
 					}
 				});
 			}
@@ -137,9 +141,9 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 				public void onClick(View v) {
 					// add user to members of meeting and the meeting in the user participation list
 					reference.child("meetings/" + values.get(position)[4] + "/members/" + values.get(position)[7]).setValue("true");
-					// meeting								// user id
+					// variables: meeting and user id
 					reference.child("users/" + values.get(position)[7] + "/meetings/" + values.get(position)[4]).setValue("true");
-					// user id								// meeting
+					// variables: user id and meeting
 					helper.goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString);
 
 					Calendar calendar = Calendar.getInstance(Locale.UK);
