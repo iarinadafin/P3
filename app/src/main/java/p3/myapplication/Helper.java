@@ -36,8 +36,17 @@ public class Helper {
 		c.startActivity(i);
 	}
 
-	void goToProfile () {
+	public void goToProfile (boolean isOwnProfile, String userID) {
 		Intent i = new Intent(c, UserProfileActivity.class);
+
+		// if the user tries to access their own profile, send "true"; send "false" otherwise
+		if (isOwnProfile)
+			i.putExtra("p3.myapplication:isOwnProfile", "true");
+		else {
+			i.putExtra("p3.myapplication:isOwnProfile", "false");
+			i.putExtra("p3.myapplication:userID", userID);
+		}
+
 		c.startActivity(i);
 	}
 

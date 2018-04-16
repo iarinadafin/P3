@@ -49,7 +49,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_module_meetings);
 
 		// set navbar behaviour
-		BottomNavigationView navigation = findViewById(R.id.navigationChatsList);
+		BottomNavigationView navigation = findViewById(R.id.navigationModuleMeetings);
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -64,7 +64,7 @@ public class ModuleMeetingsActivity extends AppCompatActivity {
 						return false;
 					}
 					case R.id.action_profile: {
-						helper.goToProfile();
+						helper.goToProfile(true, currentUid);
 						return false;
 					}
 				}

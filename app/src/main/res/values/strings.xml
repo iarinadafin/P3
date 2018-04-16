@@ -266,6 +266,7 @@
 
     <!-- User profile activity -->
     <string name="my_profile_title">My profile</string>
+    <string name="user_profile_title">%s\'s profile</string>
     <string name="logout">Logout</string>
     <string name="your_details_label">Details</string>
     <string name="full_name_label">Name</string>

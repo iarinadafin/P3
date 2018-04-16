@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,19 +47,16 @@ public class ChatsListActivity extends AppCompatActivity {
 						helper.goHome();
 						return false;
 					}
-					case R.id.action_messages: {
-						helper.goToMessages();
-						return false;
-					}
 					case R.id.action_profile: {
-						helper.goToProfile();
+						helper.goToProfile(true, userUid);
 						return false;
 					}
 				}
 				return false;
 			}
 		});
-		navigation.getMenu().getItem(1).setCheckable(true);
+		// selects the 'messages' nav button
+		navigation.getMenu().getItem(1).setChecked(true);
 
 		reference.addValueEventListener(new ValueEventListener() {
 			@Override

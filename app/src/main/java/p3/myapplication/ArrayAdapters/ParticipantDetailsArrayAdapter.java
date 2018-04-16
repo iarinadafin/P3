@@ -9,9 +9,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import p3.myapplication.Helper;
 import p3.myapplication.R;
 
 /**
@@ -19,6 +24,8 @@ import p3.myapplication.R;
  */
 
 public class ParticipantDetailsArrayAdapter extends ArrayAdapter<String[]> {
+
+	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	private Context context;
 
@@ -39,13 +46,25 @@ public class ParticipantDetailsArrayAdapter extends ArrayAdapter<String[]> {
 		// handles null list of values
 		listItem = LayoutInflater.from(context).inflate(R.layout.participant_row_item, parent, false);
 
+		final Helper helper = new Helper(context);
+
 		TextView participantName = listItem.findViewById(R.id.participantNameView);
 		TextView ratingLabel = listItem.findViewById(R.id.participantRatingView);
 
-		String nameString = String.format(context.getResources().getString(R.string.full_name), values.get(position)[0], values.get(position)[1]);
+		String nameString = String.format(context.getResources().getString(R.string.full_name), values.get(position)[1], values.get(position)[2]);
 		participantName.setText(nameString);
 
-		ratingLabel.setText(values.get(position)[2]);
+		ratingLabel.setText(values.get(position)[3]);
+
+		listItem.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (values.get(position)[0].equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+					helper.goToProfile(true, values.get(position)[0]);
+				else
+					helper.goToProfile(false, values.get(position)[0]);
+			}
+		});
 
 		return listItem;
 	}

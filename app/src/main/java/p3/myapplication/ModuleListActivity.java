@@ -56,8 +56,7 @@ public class ModuleListActivity extends AppCompatActivity {
 						return false;
 					}
 					case R.id.action_profile: {
-						mAuth.signOut();
-						helper.goToSignIn();
+						helper.goToProfile(true, mAuth.getCurrentUser().getUid());
 						return false;
 					}
 				}

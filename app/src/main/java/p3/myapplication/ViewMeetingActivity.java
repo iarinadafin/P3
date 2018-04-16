@@ -90,13 +90,14 @@ public class ViewMeetingActivity extends AppCompatActivity {
 						return false;
 					}
 					case R.id.action_profile: {
-						helper.goToProfile();
+						helper.goToProfile(true, FirebaseAuth.getInstance().getCurrentUser().getUid());
 						return false;
 					}
 				}
 				return false;
 			}
 		});
+		navigation.getMenu().findItem(navigation.getSelectedItemId()).setCheckable(false);
 
 		reference.addValueEventListener(new ValueEventListener() {
 			@Override
@@ -125,8 +126,11 @@ public class ViewMeetingActivity extends AppCompatActivity {
 		List<String[]> values = new ArrayList<>();
 		for (DataSnapshot data : dataSnapshot.child(referenceString + "/members").getChildren()) {
 			DataSnapshot user = dataSnapshot.child("users/" + data.getKey());
-			String rating = String.format(java.util.Locale.US,"%.1f", helper.getRating(dataSnapshot));
-			values.add(new String[] {user.child("firstName").getValue(String.class), user.child("lastName").getValue(String.class), rating});
+			String rating = String.format(java.util.Locale.US,"%.1f", helper.getRating(dataSnapshot.child("users/" + data.getKey())));
+			values.add(new String[] {user.getKey(), // key of the user in the list [0]
+									 user.child("firstName").getValue(String.class), // first name of the user in the list [1]
+									 user.child("lastName").getValue(String.class), // last name of the user in the list [2]
+									 rating}); // rating of the user in the list [3]
 		}
 
 		// if meeting still exists

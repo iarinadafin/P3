@@ -4,11 +4,14 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
 	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
+	TextView profileTitle;
 	Button logout;
 	TextView name;
 	TextView course;
@@ -32,17 +36,24 @@ public class UserProfileActivity extends AppCompatActivity {
 	TextView email;
 	RatingBar ratingBar;
 	TextView ratingNumber;
+	TextView ratingDescription;
 	TextView level;
 	SeekBar scoreBar;
 	TextView minBoundary;
 	TextView maxBoundary;
 	TextView pointsLeft;
+	LinearLayout scorePanel;
+
+	Helper helper = new Helper(this);
+	String userUid;
+	Boolean isOwnProfile;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_user_profile);
 
+		profileTitle = findViewById(R.id.profileTitle);
 		logout = findViewById(R.id.logoutButtonProfile);
 		name = findViewById(R.id.nameLabelProfile);
 		course = findViewById(R.id.courseLabelProfile);
@@ -50,14 +61,19 @@ public class UserProfileActivity extends AppCompatActivity {
 		email = findViewById(R.id.emailLabelProfile);
 		ratingBar = findViewById(R.id.ratingProfile);
 		ratingNumber = findViewById(R.id.ratingNumbersProfile);
+		ratingDescription = findViewById(R.id.ratingDescription);
 		level = findViewById(R.id.levelLabelProfile);
 		scoreBar = findViewById(R.id.scoreProgress);
 		minBoundary = findViewById(R.id.minScoreBoundary);
 		maxBoundary = findViewById(R.id.maxScoreBoundary);
 		pointsLeft = findViewById(R.id.pointsLeft);
+		scorePanel = findViewById(R.id.scorePanel);
+
+		userUid = getIntent().getExtras().getString("p3.myapplication:userID");
+		isOwnProfile = Boolean.parseBoolean(getIntent().getExtras().getString("p3.myapplication:isOwnProfile"));
 
 		// set navbar behaviour
-		BottomNavigationView navigation = findViewById(R.id.navigationChatsList);
+		BottomNavigationView navigation = findViewById(R.id.navigationProfile);
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -71,17 +87,40 @@ public class UserProfileActivity extends AppCompatActivity {
 						helper.goToMessages();
 						return false;
 					}
-					case R.id.action_profile: {
-						helper.goToProfile();
-						return false;
-					}
 				}
 				return false;
 			}
 		});
-		navigation.getMenu().getItem(2).setCheckable(true);
 
-		// disables seekbar touch
+		String referenceString;
+		if (isOwnProfile) {
+			// selects the 'profile' nav button if own profile
+			navigation.getMenu().getItem(2).setChecked(true);
+
+			// if the user is trying to access their own profile
+			referenceString = "users/" + FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+			// logout is only available to the profile of the current user
+			logout.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					FirebaseAuth.getInstance().signOut();
+					helper.goToSignIn();
+				}
+			});
+		}
+		else {
+			navigation.getMenu().findItem(navigation.getSelectedItemId()).setCheckable(false);
+
+			referenceString = "users/" + userUid;
+
+			// makes the logout button, rating description and score panel inaccessible
+			logout.setVisibility(View.GONE);
+			ratingDescription.setVisibility(View.GONE);
+			scorePanel.setVisibility(View.GONE);
+		}
+
+		// disables score seekbar touch
 		scoreBar.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -89,7 +128,7 @@ public class UserProfileActivity extends AppCompatActivity {
 			}
 		});
 
-		reference.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+		reference.child(referenceString).addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				showData(dataSnapshot);
@@ -100,17 +139,14 @@ public class UserProfileActivity extends AppCompatActivity {
 
 			}
 		});
-
-		logout.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				FirebaseAuth.getInstance().signOut();
-				goToSignIn();
-			}
-		});
 	}
 
 	public void showData (DataSnapshot dataSnapshot) {
+		if (!isOwnProfile) {
+			// sets custom title
+			String title = String.format(getResources().getString(R.string.user_profile_title), dataSnapshot.child("firstName").getValue(String.class));
+			profileTitle.setText(title);
+		}
 		// sets user details
 		String fullName = String.format(getResources().getString(R.string.full_name),
 										dataSnapshot.child("firstName").getValue(String.class),
@@ -121,27 +157,25 @@ public class UserProfileActivity extends AppCompatActivity {
 		email.setText(dataSnapshot.child("email").getValue(String.class));
 
 		// sets user rating
-		float meanRating = new Helper(this).getRating(dataSnapshot);
+		float meanRating = helper.getRating(dataSnapshot);
 		ratingBar.setRating(meanRating);
 		ratingNumber.setText(String.format(java.util.Locale.US,"%.1f", meanRating));
 
-		// sets user score and level
-		int score = Integer.parseInt(dataSnapshot.child("score").getValue(String.class));
-		Pair<Integer, Pair<Integer, Integer>> scoreInformation = getLevel(score);
-		String levelLabel = String.format(getResources().getString(R.string.level_label), scoreInformation.first, score);
-		level.setText(levelLabel);
-		scoreBar.setMax(scoreInformation.second.second - scoreInformation.second.first);
-		scoreBar.setProgress(score - scoreInformation.second.first);
-		minBoundary.setText(String.valueOf(scoreInformation.second.first));
-		maxBoundary.setText(String.valueOf(scoreInformation.second.second));
+		if (isOwnProfile) {
+			// sets user score and level
+			int score = Integer.parseInt(dataSnapshot.child("score").getValue(String.class));
+			Pair<Integer, Pair<Integer, Integer>> scoreInformation = getLevel(score);
+			String levelLabel = String.format(getResources().getString(R.string.level_label), scoreInformation.first, score);
+			level.setText(levelLabel);
+			scoreBar.setMax(scoreInformation.second.second - scoreInformation.second.first);
+			scoreBar.setProgress(score - scoreInformation.second.first);
+			minBoundary.setText(String.valueOf(scoreInformation.second.first));
+			maxBoundary.setText(String.valueOf(scoreInformation.second.second));
 
-		// sets the remaining points
-		String points = String.format(getResources().getString(R.string.points_left_label), scoreInformation.second.second - score);
-		pointsLeft.setText(points);
-	}
-
-	public void goToSignIn () {
-		new Helper(this).goToSignIn();
+			// sets the remaining points
+			String points = String.format(getResources().getString(R.string.points_left_label), scoreInformation.second.second - score);
+			pointsLeft.setText(points);
+		}
 	}
 
 	/**

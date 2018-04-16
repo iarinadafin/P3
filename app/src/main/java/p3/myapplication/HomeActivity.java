@@ -31,8 +31,8 @@ import p3.myapplication.ArrayAdapters.MeetingDetailsArrayAdapter;
 
 public class HomeActivity extends AppCompatActivity {
 
-	FirebaseAuth mAuth;
-	DatabaseReference reference;
+	FirebaseAuth mAuth = FirebaseAuth.getInstance();
+	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
 	TextView welcomeMessage;
 	Button createMeeting;
@@ -49,8 +49,7 @@ public class HomeActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 
-		mAuth = FirebaseAuth.getInstance();
-		reference = FirebaseDatabase.getInstance().getReference();
+		currentUid = mAuth.getCurrentUser().getUid();
 
 		BottomNavigationView navigation = findViewById(R.id.navigation);
 		navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -63,7 +62,7 @@ public class HomeActivity extends AppCompatActivity {
 						return false;
 					}
 					case R.id.action_profile: {
-						helper.goToProfile();
+						helper.goToProfile(true, mAuth.getCurrentUser().getUid());
 						return false;
 					}
 				}
@@ -113,7 +112,7 @@ public class HomeActivity extends AppCompatActivity {
 	}
 
 	public void showTitle () {
-		reference.child("users").child(currentUid).addValueEventListener(new ValueEventListener() {
+		reference.child("users/" + currentUid).addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				showData(dataSnapshot);
