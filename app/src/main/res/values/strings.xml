@@ -216,7 +216,7 @@
     <string name="view_button">View</string>
     <string name="message_button">Message</string>
     <string name="join_button">Join</string>
-    <string name="end_button">End</string>
+    <string name="end_button">Finish</string>
     <string name="join_meeting">Join meeting</string>
     <string name="date_field">%1$s, %2$s %3$s, %4$s</string>
     <plurals name="no_of_participants">
@@ -232,7 +232,7 @@
     <!-- View meeting activity -->
     <string name="edit_meeting">Edit</string>
     <string name="leave_meeting">Leave meeting</string>
-    <string name="end_meeting">End meeting</string>
+    <string name="end_meeting">Finish meeting</string>
     <string name="participants_label">Participants</string>
     <string name="details_label">Details</string>
     <string name="date_label">Date</string>
@@ -260,7 +260,7 @@
     <string name="message_typing_hint">Type a message&#8230;</string>
 
     <!-- Rating activity -->
-    <string name="meeting_rating_title">Rate this meeting</string>
+    <string name="meeting_rating_title">Rate the meeting</string>
     <string name="absence_checkbox">Absent?</string>
     <string name="receive_points">You will receive 10 points!</string>
 
@@ -278,4 +278,7 @@
     <string name="your_score_label">Score</string>
     <string name="points_left_label">%d points to the next level</string>
     <string name="level_label">Level %1$d - %2$d points</string>
+
+    <string name="leaderboard_position">%s pts</string>
+    <string name="leaderboard_title">Leaderboard</string>
 </resources>

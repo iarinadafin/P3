@@ -10,8 +10,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,7 +36,6 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 	private Context context;
 
 	private List<String[]> values = new ArrayList<>();
-	private Helper helper;
 
 	public MeetingDetailsArrayAdapter(int resource, Context context, List<String[]> values) {
 		super(context, resource , values);
@@ -41,6 +44,7 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 	}
 
 	@SuppressLint("ViewHolder")
+	@SuppressWarnings("ConstantConditions")
 	@NonNull
 	@Override
 	public View getView (final int position, final View convertView, @NonNull ViewGroup parent) {
@@ -49,8 +53,7 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 		// handles null list of values
 		listItem = LayoutInflater.from(context).inflate(R.layout.meeting_details_row_item, parent, false);
 
-		// helper class
-		helper = new Helper(context);
+		final Helper helper = new Helper(context);
 
 		// import all fields that need to be populated in a card
 		TextView title = listItem.findViewById(R.id.titleLabel);
@@ -151,6 +154,19 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 					reference.child("chats/" + values.get(position)[4]).push().setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
 																								"system",
 																								values.get(position)[8] + " joined"));
+					// adds 10 points when meeting is joined
+					reference.addListenerForSingleValueEvent(new ValueEventListener() {
+						@Override
+						public void onDataChange(DataSnapshot dataSnapshot) {
+							helper.addPoints(dataSnapshot, reference, FirebaseAuth.getInstance().getCurrentUser().getUid(), 10);
+						}
+
+						@Override
+						public void onCancelled(DatabaseError databaseError) {
+
+						}
+					});
+
 				}
 			});
 		}

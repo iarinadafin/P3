@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -104,9 +106,10 @@ public class SignUpActivity extends Activity {
 			field.setError("Required");
 	}
 
-	public void signUp (String password) {
+	public void signUp (final String password) {
 
 		mAuth.createUserWithEmailAndPassword(user.getEmail(), password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+			@SuppressWarnings("ConstantConditions")
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
 				if (task.isSuccessful()) {
@@ -117,9 +120,18 @@ public class SignUpActivity extends Activity {
 
 					helper.goToSignIn();
 				} else {
-					// If sign in fails, display a message to the user.
+					try {
+						throw task.getException();
+					} catch(FirebaseAuthWeakPasswordException e) {
+						passwordField.setError("Weak password!");
+						passwordField.requestFocus();
+					} catch(FirebaseAuthUserCollisionException e) {
+						Toast.makeText(SignUpActivity.this, "User already exists", Toast.LENGTH_SHORT).show();
+					} catch(Exception e) {
+						Toast.makeText(SignUpActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+					}
+
 					Log.w("mytag", "createUserWithEmail:failure", task.getException());
-					Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
 					progressBar.setVisibility(View.GONE);
 				}
 			}

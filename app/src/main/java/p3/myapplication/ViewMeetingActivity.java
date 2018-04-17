@@ -176,7 +176,6 @@ public class ViewMeetingActivity extends AppCompatActivity {
 					leaveMeeting.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							goToModuleMeetings();
 
 							reference.addListenerForSingleValueEvent(new ValueEventListener() {
 								@Override
@@ -185,13 +184,14 @@ public class ViewMeetingActivity extends AppCompatActivity {
 									// if current user is the only participant
 									if (dataSnapshot.child("meetings/" + meetingID + "/members").getChildrenCount() <= 1) {
 										helper.deleteMeeting(FirebaseAuth.getInstance().getCurrentUser().getUid(), reference, meetingID);
-										// subtract 10 points if meeting is left
-										helper.addPoints(dataSnapshot, reference, FirebaseAuth.getInstance().getCurrentUser().getUid(), -10);
 										// redirects the user to the home page
 										helper.goHome();
 									}
 									else
 										removeUserFromMeeting(meetingID, dataSnapshot);
+
+									// subtract 10 points if meeting is left
+									helper.addPoints(dataSnapshot, reference, FirebaseAuth.getInstance().getCurrentUser().getUid(), -10);
 								}
 
 								@Override

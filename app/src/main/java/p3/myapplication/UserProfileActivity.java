@@ -1,5 +1,6 @@
 package p3.myapplication;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import p3.myapplication.ArrayAdapters.LeaderboardItem;
+
 @SuppressWarnings("ConstantConditions")
 public class UserProfileActivity extends AppCompatActivity {
 
@@ -43,6 +46,7 @@ public class UserProfileActivity extends AppCompatActivity {
 	TextView maxBoundary;
 	TextView pointsLeft;
 	LinearLayout scorePanel;
+	Button leaderboard;
 
 	Helper helper = new Helper(this);
 	String userUid;
@@ -68,6 +72,7 @@ public class UserProfileActivity extends AppCompatActivity {
 		maxBoundary = findViewById(R.id.maxScoreBoundary);
 		pointsLeft = findViewById(R.id.pointsLeft);
 		scorePanel = findViewById(R.id.scorePanel);
+		leaderboard = findViewById(R.id.leaderboardButton);
 
 		userUid = getIntent().getExtras().getString("p3.myapplication:userID");
 		isOwnProfile = Boolean.parseBoolean(getIntent().getExtras().getString("p3.myapplication:isOwnProfile"));
@@ -106,6 +111,14 @@ public class UserProfileActivity extends AppCompatActivity {
 				public void onClick(View v) {
 					FirebaseAuth.getInstance().signOut();
 					helper.goToSignIn();
+				}
+			});
+
+			// goes to leaderboard activity
+			leaderboard.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					goToLeaderboard();
 				}
 			});
 		}
@@ -161,12 +174,14 @@ public class UserProfileActivity extends AppCompatActivity {
 		ratingBar.setRating(meanRating);
 		ratingNumber.setText(String.format(java.util.Locale.US,"%.1f", meanRating));
 
+		// sets user score and level
+		int score = Integer.parseInt(dataSnapshot.child("score").getValue(String.class));
+		Pair<Integer, Pair<Integer, Integer>> scoreInformation = getLevel(score);
+		String levelLabel = String.format(getResources().getString(R.string.level_label), scoreInformation.first, score);
+		level.setText(levelLabel);
+
 		if (isOwnProfile) {
-			// sets user score and level
-			int score = Integer.parseInt(dataSnapshot.child("score").getValue(String.class));
-			Pair<Integer, Pair<Integer, Integer>> scoreInformation = getLevel(score);
-			String levelLabel = String.format(getResources().getString(R.string.level_label), scoreInformation.first, score);
-			level.setText(levelLabel);
+
 			scoreBar.setMax(scoreInformation.second.second - scoreInformation.second.first);
 			scoreBar.setProgress(score - scoreInformation.second.first);
 			minBoundary.setText(String.valueOf(scoreInformation.second.first));
@@ -195,5 +210,13 @@ public class UserProfileActivity extends AppCompatActivity {
 		else if (score >= 70 && score < 100)
 			return new Pair<>(5, new Pair<>(70, 100));
 		else return new Pair<>(6, new Pair<>(100, 150));
+	}
+
+	/**
+	 * Starts the leaderboard activity
+	 */
+	void goToLeaderboard () {
+		Intent i = new Intent(this, LeaderboardActivity.class);
+		startActivity(i);
 	}
 }

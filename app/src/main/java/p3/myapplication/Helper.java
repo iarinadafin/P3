@@ -79,7 +79,7 @@ public class Helper {
 		reference.child("chats/" + meetingID).removeValue();
 	}
 
-	void addPoints (DataSnapshot dataSnapshot, DatabaseReference reference, String userUid, int points) {
+	public void addPoints (DataSnapshot dataSnapshot, DatabaseReference reference, String userUid, int points) {
 		int score = Integer.parseInt(dataSnapshot.child("users/" + userUid + "/score").getValue(String.class));
 		reference.child("users/" + userUid + "/score").setValue(String.valueOf(score + points));
 	}
