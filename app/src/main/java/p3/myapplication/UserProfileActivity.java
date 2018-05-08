@@ -110,7 +110,7 @@ public class UserProfileActivity extends AppCompatActivity {
 				@Override
 				public void onClick(View v) {
 					FirebaseAuth.getInstance().signOut();
-					helper.goToSignIn();
+					helper.goToSignIn(false);
 				}
 			});
 

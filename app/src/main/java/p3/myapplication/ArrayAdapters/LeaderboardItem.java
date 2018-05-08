@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import p3.myapplication.Helper;
+import p3.myapplication.LeaderboardActivity;
 import p3.myapplication.R;
 
 /**

@@ -46,9 +46,12 @@ public class ViewMeetingActivity extends AppCompatActivity {
 	Button joinMeeting;
 	Button endMeeting;
 	LinearLayout manageMeetingPanel;
+	Button editButton;
 
 	String referenceString;
 	String meetingID;
+	String meetingName;
+	String currentUserName;
 	Helper helper;
 
 	@Override
@@ -72,6 +75,7 @@ public class ViewMeetingActivity extends AppCompatActivity {
 		joinMeeting = findViewById(R.id.joinMeetingButtonView);
 		endMeeting = findViewById(R.id.endMeetingButtonView);
 		manageMeetingPanel = findViewById(R.id.manageMeetingPanel);
+		editButton = findViewById(R.id.editButtonView);
 
 		// by default, the end meeting option is not visible
 		endMeeting.setVisibility(View.GONE);
@@ -114,6 +118,13 @@ public class ViewMeetingActivity extends AppCompatActivity {
 				Log.d("mytag", "realtimeDatabase:error");
 			}
 		});
+
+		editButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				goToEdit();
+			}
+		});
 	}
 
 	public void showData (final DataSnapshot dataSnapshot) throws ParseException {
@@ -121,6 +132,9 @@ public class ViewMeetingActivity extends AppCompatActivity {
 		moduleLabel.setText(getIntent().getExtras().getString("p3.myapplication:module_id"));
 		date.setText(getIntent().getExtras().getString("p3.myapplication:date"));
 		time.setText(getIntent().getExtras().getString("p3.myapplication:hours"));
+
+		meetingName = dataSnapshot.child(referenceString + "/name").getValue(String.class);
+		currentUserName = dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/firstName").getValue(String.class);
 
 		// gets all the participants in /[meeting]/members and looks for the matching key information in /users
 		List<String[]> values = new ArrayList<>();
@@ -226,7 +240,7 @@ public class ViewMeetingActivity extends AppCompatActivity {
 						calendar.add(Calendar.HOUR_OF_DAY, 1);
 						reference.child("chats/" + meetingID).push().setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
 								"system",
-								dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/firstName").getValue(String.class) + " joined"));
+								dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/firstName").getValue(String.class) + " joined the chat"));
 
 						// add 10 points if meeting is joined
 						helper.addPoints(dataSnapshot, reference, FirebaseAuth.getInstance().getCurrentUser().getUid(), 10);
@@ -243,13 +257,6 @@ public class ViewMeetingActivity extends AppCompatActivity {
 		participantsList.setAdapter(participantListAdapter);
 	}
 
-	// todo: duplicate intention
-	public void goToModuleMeetings () {
-		Intent i = new Intent(this, ModuleMeetingsActivity.class);
-		i.putExtra("p3.myapplication:module", moduleLabel.getText().toString());
-		startActivity(i);
-	}
-
 	// removes user from meeting
 	public void removeUserFromMeeting (final String meetingID, DataSnapshot dataSnapshot) {
 		// removes meeting reference from [user]
@@ -261,7 +268,7 @@ public class ViewMeetingActivity extends AppCompatActivity {
 		calendar.add(Calendar.HOUR_OF_DAY, 1);
 		reference.child("chats/" + meetingID).push().setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
 																		"system",
-																		dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/firstName").getValue(String.class) + " left"));
+																		dataSnapshot.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/firstName").getValue(String.class) + " left the chat"));
 	}
 
 	@Override
@@ -272,5 +279,29 @@ public class ViewMeetingActivity extends AppCompatActivity {
 	@Override
 	public void onStop() {
 		super.onStop();
+	}
+
+	void goToEdit () {
+		Intent i = new Intent(ViewMeetingActivity.this, EditMeeting.class);
+
+		String[] dateArray = getIntent().getExtras().getString("p3.myapplication:dateString").split("-");
+		String[] hoursArray = getIntent().getExtras().getString("p3.myapplication:hours").split(" - ");
+		String[] startDate = hoursArray[0].split(":");
+		String[] endDate = hoursArray[1].split(":");
+
+		i.putExtra("p3.myapplication:meetingReference", meetingID);
+		i.putExtra("p3.myapplication:module", moduleLabel.getText().toString());
+		i.putExtra("p3.myapplication:meetingName", meetingName);
+		i.putExtra("p3.myapplication:year", Integer.parseInt(dateArray[0]));
+		i.putExtra("p3.myapplication:month", Integer.parseInt(dateArray[1]) - 1);
+		i.putExtra("p3.myapplication:day", Integer.parseInt(dateArray[2]));
+		i.putExtra("p3.myapplication:startHour", Integer.parseInt(startDate[0]));
+		i.putExtra("p3.myapplication:startMinute", Integer.parseInt(startDate[1]));
+		i.putExtra("p3.myapplication:endHour", Integer.parseInt(endDate[0]));
+		i.putExtra("p3.myapplication:endMinute", Integer.parseInt(endDate[1]));
+		i.putExtra("p3.myapplication:name", currentUserName);
+
+		startActivity(i);
+		finish();
 	}
 }

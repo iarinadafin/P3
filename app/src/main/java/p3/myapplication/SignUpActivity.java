@@ -19,6 +19,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -68,7 +70,11 @@ public class SignUpActivity extends Activity {
 				if (validateForm(passwordField.getText().toString(), confirmPasswordField.getText().toString())) {
 					progressBar.setVisibility(View.VISIBLE);
 
-					user = new User(firstNameField.getText().toString(), lastNameField.getText().toString(), courseSpinner.getSelectedItem().toString(), ((RadioButton) findViewById(yearRadioGroup.getCheckedRadioButtonId())).getText().toString(), emailField.getText().toString());
+					user = new User(firstNameField.getText().toString(),
+									lastNameField.getText().toString(),
+									courseSpinner.getSelectedItem().toString(),
+									((RadioButton) findViewById(yearRadioGroup.getCheckedRadioButtonId())).getText().toString(),
+									emailField.getText().toString() + "@soton.ac.uk");
 
 					signUp(passwordField.getText().toString());
 				}
@@ -97,8 +103,6 @@ public class SignUpActivity extends Activity {
 				focusChange(emailField, hasFocus);
 			}
 		});
-
-		// todo: set listeners for all necessary fields
 	}
 
 	public void focusChange (EditText field, boolean hasFocus) {
@@ -107,18 +111,34 @@ public class SignUpActivity extends Activity {
 	}
 
 	public void signUp (final String password) {
-
 		mAuth.createUserWithEmailAndPassword(user.getEmail(), password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
 			@SuppressWarnings("ConstantConditions")
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
 				if (task.isSuccessful()) {
-					// Sign in success, update UI with the signed-in user's information
+					// Sign up success
 					Log.d("mytag", "createUserWithEmail:success");
+
+					FirebaseUser currentUser = mAuth.getCurrentUser();
+
+					UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+							.setDisplayName(user.getEmail().split("@")[0]).build();
+					currentUser.updateProfile(profileUpdates);
 
 					pushToDatabase(user);
 
-					helper.goToSignIn();
+					currentUser.sendEmailVerification().addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<Void>() {
+						@Override
+						public void onComplete(@NonNull Task<Void> task) {
+							if (task.isSuccessful()) {
+								helper.goToSignIn(true);
+								Log.d("mytag", "sendEmailVerification:success");
+							} else {
+								Log.e("mytag", "sendEmailVerification", task.getException());
+
+							}
+						}
+					});
 				} else {
 					try {
 						throw task.getException();
@@ -136,6 +156,11 @@ public class SignUpActivity extends Activity {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void onStart () {
+		super.onStart();
 	}
 
 	@Override
@@ -172,8 +197,8 @@ public class SignUpActivity extends Activity {
 			check = false;
 		}
 
-		// also checks for email format match by comparing to regex
-		if (emailField.getText().toString().equals("") || !emailField.getText().toString().matches("(?i:^[a-z][a-z]([a-z]?)[0-9][a-z][0-9][0-9](@soton.ac.uk)$)")) {
+		// also checks for email format match to the [anything]@soton.ac.uk regex
+		if (emailField.getText().toString().equals("") || !emailField.getText().toString().matches("(?i:^[a-z0-9]([a-z0-9]*)(@soton.ac.uk)$)")) {
 			focusChange(emailField, false);
 			check = false;
 		}

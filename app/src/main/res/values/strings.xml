@@ -16,8 +16,11 @@
     <string name="last_name_label">Last name</string>
     <string name="last_name">Carter</string>
     <string name="email_label">Email</string>
+    <string name="email_placeholder">abc1d23</string>
+    <string name="email_ending">\@soton.ac.uk</string>
     <string name="password_label">Password</string>
     <string name="confirm_password_label">Confirm password</string>
+    <string name="verify_account_label">You will need to verify  your account\nafter signing up!</string>
     <string-array name="course_array">
         <item>Electronic Engineering</item>
         <item>Computer Science</item>
@@ -256,7 +259,6 @@
 
     <!-- Chat activity -->
     <string name="view_meeting">View meeting</string>
-    <string name="user_joined_or_left_message">%s the chat</string>
     <string name="message_typing_hint">Type a message&#8230;</string>
 
     <!-- Rating activity -->
@@ -281,4 +283,6 @@
 
     <string name="leaderboard_position">%s pts</string>
     <string name="leaderboard_title">Leaderboard</string>
+
+    <string name="edit_meeting_title">Edit meeting details</string>
 </resources>

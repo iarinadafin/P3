@@ -31,6 +31,7 @@ public class SignInActivity extends Activity {
 	protected Button signUpButton;
 
 	Helper helper = new Helper(this);
+	boolean ifFromSignUp;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +43,15 @@ public class SignInActivity extends Activity {
 		try {
 			FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 		} catch (Throwable t) {
-			Log.e("mytag", "FirbaseDatabase setPersistanceEnabled exception");
+			Log.e("mytag", "FirebaseDatabase setPersistanceEnabled exception");
 		}
 		*/
+
+		// if activity comes from sign up
+		if (getIntent().getExtras() != null)
+			ifFromSignUp = Boolean.valueOf(getIntent().getExtras().getString("p3.myapplication:ifVerificationNeeded"));
+		else
+			ifFromSignUp = false;
 
 		emailLoginField = findViewById(R.id.emailLogin);
 		passwordLoginField = findViewById(R.id.passwordLogin);
@@ -72,20 +79,28 @@ public class SignInActivity extends Activity {
 				if (user != null) {
 					// User is signed in
 					Log.d("mytag", "onAuthStateChanged:signed_in:" + user.getUid());
-					helper.goHome();
+					if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+						helper.goHome();
+					}
+					else {
+						mAuth.signOut();
+						Toast.makeText(SignInActivity.this, "You need to verify your email address", Toast.LENGTH_SHORT).show();
+					}
 				} else {
 					// User is signed out
 					Log.d("mytag", "onAuthStateChanged:signed_out");
 				}
 			}
 		};
+
+		if (ifFromSignUp)
+			Toast.makeText(SignInActivity.this, "Verification email sent to your email address", Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
 		mAuth.addAuthStateListener(mAuthListener); // initialises user auth listener
-		//mAuth.signOut();
 	}
 
 	@Override
@@ -107,7 +122,6 @@ public class SignInActivity extends Activity {
 					if (task.isSuccessful()) {
 						// if sign in success, update UI
 						Log.d("mytag", "signInWithEmail:success");
-						helper.goHome();
 					} else {
 						// if sign in fails, display a message
 						Log.w("mytag", "signInWithEmail:failure", task.getException());
@@ -115,7 +129,6 @@ public class SignInActivity extends Activity {
 					}
 				}
 			});
-
 	}
 
 	/**

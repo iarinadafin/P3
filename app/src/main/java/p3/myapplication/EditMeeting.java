@@ -13,25 +13,16 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormatSymbols;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
-import p3.myapplication.Model.Meeting;
 import p3.myapplication.Model.Message;
 
-public class CreateMeetingActivity extends AppCompatActivity {
-
+public class EditMeeting extends AppCompatActivity {
 	DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 	FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
@@ -48,33 +39,45 @@ public class CreateMeetingActivity extends AppCompatActivity {
 	Button submit;
 
 	Calendar calendar = Calendar.getInstance();
-	int selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
-	int selectedMonth = calendar.get(Calendar.MONTH);
-	int selectedYear = calendar.get(Calendar.YEAR);
-	int selectedStartHour = 9;
-	int selectedStartMinute = 0;
-	int selectedEndHour = 10;
-	int selectedEndMinute = 0;
-	String moduleName;
-	String pushKey = reference.child("meetings/" + moduleName).push().getKey();
+	int selectedDay;
+	int selectedMonth;
+	int selectedYear;
+	int selectedStartHour;
+	int selectedStartMinute;
+	int selectedEndHour;
+	int selectedEndMinute;
+	String meetingReference;
+	String module;
+	String userName;
 	Helper helper = new Helper(this);
 
 	@SuppressWarnings("ConstantConditions")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_create_meeting);
+		setContentView(R.layout.activity_edit_meeting);
 
-		meetingName = findViewById(R.id.meetingNameCreate);
-		dateLabel = findViewById(R.id.dateLabelCreate);
-		startTimeLabel = findViewById(R.id.startTimeLabelCreate);
-		endTimeLabel = findViewById(R.id.endTimeLabelCreate);
-		chooseDate = findViewById(R.id.chooseDateButton);
-		chooseStartTime = findViewById(R.id.chooseStartTimeButton);
-		chooseEndTime = findViewById(R.id.chooseEndTimeButton);
-		submit = findViewById(R.id.confirmCreate);
+		meetingReference = getIntent().getExtras().getString("p3.myapplication:meetingReference");
+		module = getIntent().getExtras().getString("p3.myapplication:module");
+		selectedYear = getIntent().getExtras().getInt("p3.myapplication:year");
+		selectedMonth = getIntent().getExtras().getInt("p3.myapplication:month");
+		selectedDay = getIntent().getExtras().getInt("p3.myapplication:day");
+		selectedStartHour = getIntent().getExtras().getInt("p3.myapplication:startHour");
+		selectedStartMinute = getIntent().getExtras().getInt("p3.myapplication:startMinute");
+		selectedEndHour = getIntent().getExtras().getInt("p3.myapplication:endHour");
+		selectedEndMinute = getIntent().getExtras().getInt("p3.myapplication:endMinute");
+		userName = getIntent().getExtras().getString("p3.myapplication:name");
 
-		moduleName = getIntent().getExtras().getString("p3.myapplication:module_name_list");
+		meetingName = findViewById(R.id.meetingNameEdit);
+		dateLabel = findViewById(R.id.dateLabelEdit);
+		startTimeLabel = findViewById(R.id.startTimeLabelEdit);
+		endTimeLabel = findViewById(R.id.endTimeLabelEdit);
+		chooseDate = findViewById(R.id.chooseDateButtonEdit);
+		chooseStartTime = findViewById(R.id.chooseStartTimeButtonEdit);
+		chooseEndTime = findViewById(R.id.chooseEndTimeButtonEdit);
+		submit = findViewById(R.id.confirmEdit);
+
+		meetingName.setText(getIntent().getExtras().getString("p3.myapplication:meetingName"));
 
 		// sets date picker to now
 		helper.setDateLabel(dateLabel, selectedYear, selectedMonth, selectedDay);
@@ -85,11 +88,13 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		chooseDate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DatePickerDialog dialog = new DatePickerDialog(CreateMeetingActivity.this,
+				DatePickerDialog dialog = new DatePickerDialog(EditMeeting.this,
 						dateSetListener, selectedYear, selectedMonth, selectedDay);
 
 				long now = Calendar.getInstance().getTimeInMillis() + 3600000;
 				dialog.getDatePicker().setMinDate(now);
+
+				dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
 				dialog.show();
 			}
 		});
@@ -98,7 +103,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		chooseStartTime.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				TimePickerDialog dialog = new TimePickerDialog(CreateMeetingActivity.this,
+				TimePickerDialog dialog = new TimePickerDialog(EditMeeting.this,
 						startTimeSetListener, selectedStartHour, selectedStartMinute, true);
 				dialog.show();
 			}
@@ -108,7 +113,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 		chooseEndTime.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				TimePickerDialog dialog = new TimePickerDialog(CreateMeetingActivity.this,
+				TimePickerDialog dialog = new TimePickerDialog(EditMeeting.this,
 						endTimeSetListener, selectedEndHour, selectedEndMinute, true);
 				dialog.show();
 			}
@@ -159,49 +164,42 @@ public class CreateMeetingActivity extends AppCompatActivity {
 				// if verification passes
 				if (helper.verifyData(startDate, endDate, startTimeLabel, endTimeLabel, meetingName)) {
 					// sets all meeting information
-					reference.child("meetings/" + pushKey).setValue(new Meeting(meetingName.getText().toString(), startDate, endDate, moduleName));
-					reference.child("meetings/" + pushKey + "/members/" + mAuth.getCurrentUser().getUid()).setValue("true");
-					// sets user meeting participation
-					reference.child("users/" + mAuth.getCurrentUser().getUid() + "/meetings/" + pushKey).setValue("true");
-					// sets the system message that the user joined the chat
-					reference.addListenerForSingleValueEvent(new ValueEventListener() {
-						@Override
-						public void onDataChange(DataSnapshot dataSnapshot) {
-							calendar = Calendar.getInstance(Locale.UK);
-							calendar.add(Calendar.HOUR_OF_DAY, 1);
-							reference.child("chats/" + pushKey).push().setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
-																							"system",
-																							dataSnapshot.child("users/" + mAuth.getCurrentUser().getUid() + "/firstName").getValue(String.class) + " joined the chat"));
-							// increases user points
-							helper.addPoints(dataSnapshot, reference, mAuth.getCurrentUser().getUid(), 10);
-						}
+					reference.child("meetings/" + meetingReference + "/startDate").setValue(startDate);
+					reference.child("meetings/" + meetingReference + "/endDate").setValue(endDate);
 
-						@Override
-						public void onCancelled(DatabaseError databaseError) {
-
-						}
-					});
+					// adds an edit notification to meeting chat
+					String notification = reference.child("chats/" + meetingReference).push().getKey();
+					reference.child("chats/" + meetingReference + "/" + notification).setValue(
+							new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
+										"system",
+										userName + " edited the meeting details"));
 
 					// goes to view meeting after creation
-					helper.goToViewMeeting(pushKey,
-										   moduleName,
-										   helper.getFriendlyDate(selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay),
-										   startTimeLabel.getText().toString() + " - " + endTimeLabel.getText().toString(),
-										   selectedYear + "-" + selectedMonth + "-" + selectedDay);
+					helper.goToViewMeeting(meetingReference,
+							module,
+							helper.getFriendlyDate(selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay),
+							startTimeLabel.getText().toString() + " - " + endTimeLabel.getText().toString(),
+							selectedYear + "-" + selectedMonth + "-" + selectedDay);
 				}
 				else {
-					Toast.makeText(CreateMeetingActivity.this, "Please review your details.", Toast.LENGTH_SHORT).show();
+					Toast.makeText(EditMeeting.this, "Please review your details.", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
 	}
 
-	public void onStart() {
-		super.onStart();
+	@Override
+	public void onPause() {
+		super.onPause();
+		finish();
 	}
 
 	@Override
-	public void onStop() {
-		super.onStop();
+	public void onBackPressed() {
+		helper.goToViewMeeting(meetingReference,
+							   module,
+							   helper.getFriendlyDate(selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay),
+							   startTimeLabel.getText().toString() + " - " + endTimeLabel.getText().toString(),
+							   selectedYear + "-" + selectedMonth + "-" + selectedDay);
 	}
 }

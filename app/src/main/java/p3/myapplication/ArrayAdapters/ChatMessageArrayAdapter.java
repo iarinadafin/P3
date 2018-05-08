@@ -56,9 +56,8 @@ public class ChatMessageArrayAdapter extends ArrayAdapter<String[]> {
 			listItem.findViewById(R.id.userMessage).setVisibility(View.GONE);
 			listItem.findViewById(R.id.messageContent).setVisibility(View.GONE);
 
-			String systemMessage = String.format(context.getResources().getString(R.string.user_joined_or_left_message), values.get(position)[1]);
 			TextView systemMessageField = listItem.findViewById(R.id.systemMessage);
-			systemMessageField.setText(systemMessage);
+			systemMessageField.setText(values.get(position)[1]);
 		}
 
 		return listItem;

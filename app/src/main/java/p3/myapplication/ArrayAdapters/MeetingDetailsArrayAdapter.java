@@ -100,7 +100,7 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 		viewButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				helper.goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString);
+				helper.goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString, values.get(position)[1].split(" ")[0]);
 			}
 		});
 
@@ -147,13 +147,13 @@ public class MeetingDetailsArrayAdapter extends ArrayAdapter<String[]> {
 					// variables: meeting and user id
 					reference.child("users/" + values.get(position)[7] + "/meetings/" + values.get(position)[4]).setValue("true");
 					// variables: user id and meeting
-					helper.goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString);
+					helper.goToViewMeeting(values.get(position)[4], values.get(position)[5], dateString, hoursString, values.get(position)[1].split(" ")[0]);
 
 					Calendar calendar = Calendar.getInstance(Locale.UK);
 					calendar.add(Calendar.HOUR_OF_DAY, 1);
 					reference.child("chats/" + values.get(position)[4]).push().setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
 																								"system",
-																								values.get(position)[8] + " joined"));
+																								values.get(position)[8] + " joined the chat"));
 					// adds 10 points when meeting is joined
 					reference.addListenerForSingleValueEvent(new ValueEventListener() {
 						@Override

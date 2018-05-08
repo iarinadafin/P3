@@ -92,8 +92,8 @@ public class ChatActivity extends AppCompatActivity {
 					// gets the chat reference and pushes the message to the database location
 					reference.child("chats/" + meetingID).push()
 							.setValue(new Message(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK).format(calendar.getTime()),
-													FirebaseAuth.getInstance().getCurrentUser().getUid(),
-													input.getText().toString()));
+												  FirebaseAuth.getInstance().getCurrentUser().getUid(),
+												  input.getText().toString()));
 
 					// clear the input
 					input.setText("");
@@ -166,6 +166,6 @@ public class ChatActivity extends AppCompatActivity {
 				new SimpleDateFormat("MMM", Locale.UK).format(startDate), // friendly short month
 				new SimpleDateFormat("dd", Locale.UK).format(startDate), // day of month
 				new SimpleDateFormat("yyyy", Locale.UK).format(startDate)); // year
-		new Helper(this).goToViewMeeting(meetingID, dataSnapshot.child("module").getValue(String.class), dateString, hoursString);
+		new Helper(this).goToViewMeeting(meetingID, dataSnapshot.child("module").getValue(String.class), dateString, hoursString, dataSnapshot.child("startDate").getValue(String.class).split(" ")[0]);
 	}
 }

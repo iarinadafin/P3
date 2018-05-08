@@ -75,8 +75,7 @@ public class MeetingChatArrayAdapter extends ArrayAdapter<String[]> {
 						lastMessageSender = listItem.findViewById(R.id.senderNameLabel);
 						lastMessageSender.setVisibility(View.GONE);
 
-						String message = String.format(context.getResources().getString(R.string.user_joined_or_left_message), data.child("content").getValue(String.class));
-						lastMessage.setText(message);
+						lastMessage.setText(data.child("content").getValue(String.class));
 					}
 					// if the message is a registered user's message
 					else {
